@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* KalaVerse Design System - Indian Traditional Art Inspired */
+    --background: 35 20% 97%;
+    --foreground: 25 25% 15%;
+
+    --card: 35 15% 96%;
+    --card-foreground: 25 25% 15%;
+
+    --popover: 35 15% 96%;
+    --popover-foreground: 25 25% 15%;
+
+    /* Saffron-inspired primary */
+    --primary: 28 85% 55%;
+    --primary-foreground: 35 20% 97%;
+
+    /* Terracotta secondary */
+    --secondary: 18 65% 70%;
+    --secondary-foreground: 25 25% 15%;
+
+    /* Warm muted tones */
+    --muted: 35 15% 92%;
+    --muted-foreground: 25 15% 45%;
+
+    /* Gold accent */
+    --accent: 45 90% 60%;
+    --accent-foreground: 25 25% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Soft borders */
+    --border: 35 15% 88%;
+    --input: 35 15% 88%;
+    --ring: 28 85% 55%;
+
+    /* Design system extensions */
+    --hero: 28 85% 55%;
+    --hero-foreground: 35 20% 97%;
+    
+    /* Cultural gradients */
+    --gradient-saffron: linear-gradient(135deg, hsl(28 85% 55%), hsl(45 90% 60%));
+    --gradient-terracotta: linear-gradient(135deg, hsl(18 65% 70%), hsl(25 45% 65%));
+    --gradient-cultural: linear-gradient(135deg, hsl(28 85% 55%), hsl(18 65% 70%));
+    
+    /* Shadows */
+    --shadow-warm: 0 10px 30px -10px hsl(28 85% 55% / 0.2);
+    --shadow-elegant: 0 4px 20px hsl(25 25% 15% / 0.1);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 25 25% 8%;
+    --foreground: 35 20% 92%;
+
+    --card: 25 20% 10%;
+    --card-foreground: 35 20% 92%;
+
+    --popover: 25 20% 10%;
+    --popover-foreground: 35 20% 92%;
+
+    --primary: 28 85% 55%;
+    --primary-foreground: 25 25% 8%;
+
+    --secondary: 25 20% 15%;
+    --secondary-foreground: 35 20% 92%;
+
+    --muted: 25 20% 15%;
+    --muted-foreground: 35 15% 65%;
+
+    --accent: 45 90% 60%;
+    --accent-foreground: 25 25% 8%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 35 20% 92%;
+
+    --border: 25 20% 15%;
+    --input: 25 20% 15%;
+    --ring: 28 85% 55%;
+    
+    --hero: 28 85% 55%;
+    --hero-foreground: 25 25% 8%;
+    
+    --gradient-saffron: linear-gradient(135deg, hsl(28 85% 45%), hsl(45 90% 50%));
+    --gradient-terracotta: linear-gradient(135deg, hsl(18 65% 50%), hsl(25 45% 45%));
+    --gradient-cultural: linear-gradient(135deg, hsl(28 85% 45%), hsl(18 65% 50%));
+    
+    --shadow-warm: 0 10px 30px -10px hsl(28 85% 45% / 0.3);
+    --shadow-elegant: 0 4px 20px hsl(25 25% 8% / 0.2);
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
