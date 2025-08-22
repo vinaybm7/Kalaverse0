@@ -1,73 +1,45 @@
-# Welcome to your Lovable project
+# KalaVerse
 
-## Project info
+A digital platform celebrating traditional Indian art forms and connecting artists with art enthusiasts worldwide.
 
-**URL**: https://lovable.dev/projects/d5166128-f13a-41de-ad32-f33451d66f24
+## About
 
-## How can I edit this code?
+KalaVerse is dedicated to preserving and promoting India's rich cultural heritage through traditional art forms like Warli, Madhubani, and Pithora art. Our platform provides a space for talented local artists to showcase their work and connect with a global audience.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- Browse authentic traditional Indian artworks
+- Connect with local artists
+- Learn about different art forms and their cultural significance
+- Support traditional artisans through direct purchases
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d5166128-f13a-41de-ad32-f33451d66f24) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- React 18 with TypeScript
+- Vite for fast development
+- Tailwind CSS for styling
+- shadcn/ui for components
+- React Router for navigation
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+# Install dependencies
+npm install
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## Art Forms Featured
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Warli Art**: Traditional tribal art from Maharashtra
+- **Madhubani Art**: Vibrant folk art from Bihar
+- **Pithora Art**: Colorful ritual art from Gujarat
 
-**Use GitHub Codespaces**
+## Contributing
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/d5166128-f13a-41de-ad32-f33451d66f24) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+We welcome contributions to help preserve and promote traditional Indian art forms.
