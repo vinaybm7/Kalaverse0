@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface CartItem {
   id: number;
@@ -13,7 +14,7 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
+  addToCart: (item: Omit<CartItem, 'quantity'>, onAuthRequired?: () => void) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
@@ -36,6 +37,7 @@ export const useCart = () => {
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -54,7 +56,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('kalaverse-cart', JSON.stringify(items));
   }, [items]);
 
-  const addToCart = (newItem: Omit<CartItem, 'quantity'>) => {
+  const addToCart = (newItem: Omit<CartItem, 'quantity'>, onAuthRequired?: () => void) => {
+    // Check if user is authenticated
+    if (!user) {
+      toast({
+        title: "Sign In Required",
+        description: "Please sign in to add items to your cart.",
+        variant: "destructive"
+      });
+      
+      // Call the callback to open auth modal if provided
+      if (onAuthRequired) {
+        onAuthRequired();
+      }
+      return;
+    }
+
     setItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === newItem.id);
       

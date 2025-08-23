@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/hooks/useSearch";
 import { SearchBar } from "@/components/search/SearchBar";
+import { AuthModal } from "@/components/auth/AuthModal";
 import { artworks } from "@/data/artworks";
 
 interface ArtGalleryProps {
@@ -16,6 +17,7 @@ interface ArtGalleryProps {
 
 export const ArtGallery = ({ initialSearchQuery = '' }: ArtGalleryProps) => {
   const [likedArtworks, setLikedArtworks] = useState<number[]>([]);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { addToCart } = useCart();
   
   const {
@@ -62,6 +64,9 @@ export const ArtGallery = ({ initialSearchQuery = '' }: ArtGalleryProps) => {
       category: artwork.category,
       price: artwork.price,
       image: artwork.image
+    }, () => {
+      // Open auth modal if user is not authenticated
+      setIsAuthModalOpen(true);
     });
   };
 
@@ -204,6 +209,13 @@ export const ArtGallery = ({ initialSearchQuery = '' }: ArtGalleryProps) => {
           </div>
         )}
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultMode="login"
+      />
     </section>
   );
 };

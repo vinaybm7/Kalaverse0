@@ -8,6 +8,7 @@ import { Heart, Share2, ShoppingCart, Star, ArrowLeft, MapPin, Eye } from "lucid
 import { getArtworkById, getArtistById } from "@/data/artworks";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 const ArtworkDetail = () => {
   const { artworkId } = useParams();
@@ -43,6 +44,8 @@ const ArtworkDetail = () => {
     });
   };
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   const handleAddToCart = () => {
     addToCart({
       id: artwork.id,
@@ -51,6 +54,9 @@ const ArtworkDetail = () => {
       category: artwork.category,
       price: artwork.price,
       image: artwork.image
+    }, () => {
+      // Open auth modal if user is not authenticated
+      setIsAuthModalOpen(true);
     });
   };
 
@@ -235,6 +241,13 @@ const ArtworkDetail = () => {
       </div>
 
       <Footer />
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultMode="login"
+      />
     </main>
   );
 };

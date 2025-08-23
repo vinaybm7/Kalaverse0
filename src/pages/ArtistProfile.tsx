@@ -9,10 +9,12 @@ import { getArtistById, getArtworksByArtist } from "@/data/artworks";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export const ArtistProfile = () => {
   const { artistId } = useParams<{ artistId: string }>();
   const [likedArtworks, setLikedArtworks] = useState<number[]>([]);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { addToCart } = useCart();
   
   const artist = artistId ? getArtistById(artistId) : null;
@@ -60,6 +62,9 @@ export const ArtistProfile = () => {
       category: artwork.category,
       price: artwork.price,
       image: artwork.image
+    }, () => {
+      // Open auth modal if user is not authenticated
+      setIsAuthModalOpen(true);
     });
   };
 
@@ -261,6 +266,13 @@ export const ArtistProfile = () => {
       </section>
       
       <Footer />
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultMode="login"
+      />
     </div>
   );
 };

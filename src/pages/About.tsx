@@ -37,26 +37,7 @@ export const About = () => {
     }
   ];
 
-  const team = [
-    {
-      name: "Priya Sharma",
-      role: "Founder & CEO",
-      image: "/artist-1.png",
-      description: "Art historian passionate about preserving traditional Indian art forms"
-    },
-    {
-      name: "Arjun Patel",
-      role: "Head of Artist Relations",
-      image: "/artist-2.png", 
-      description: "Works directly with artists to ensure authentic representation"
-    },
-    {
-      name: "Meera Singh",
-      role: "Cultural Curator",
-      image: "/artist-3.png",
-      description: "Expert in traditional art forms with 15+ years of experience"
-    }
-  ];
+
 
   return (
     <div className="min-h-screen">
@@ -235,32 +216,7 @@ export const About = () => {
         </div>
       </section>
       
-      {/* Team Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Passionate individuals dedicated to preserving traditional art forms
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <Card key={index} className="text-center p-6">
-                <img 
-                  src={member.image} 
-                  alt={member.name}
-                  className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
-                />
-                <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
-                <p className="text-primary font-medium mb-3">{member.role}</p>
-                <p className="text-sm text-muted-foreground">{member.description}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+
       
       {/* CTA Section */}
       <section className="py-16">
