@@ -61,7 +61,11 @@ export const Navigation = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border relative overflow-hidden">
+        {/* Traditional Art Pattern Overlay */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
+          <div className="traditional-pattern-bg h-full w-full"></div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -129,12 +133,12 @@ export const Navigation = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                className="md:hidden"
+                className="md:hidden hover:scale-110 transition-transform duration-200"
                 onClick={() => {
-                  toast({
-                    title: "Search",
-                    description: "Use the search bar in the gallery section!"
-                  });
+                  const searchQuery = prompt("Search artworks:");
+                  if (searchQuery?.trim()) {
+                    navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+                  }
                 }}
               >
                 <Search className="w-4 h-4" />
@@ -143,7 +147,7 @@ export const Navigation = () => {
                 variant="ghost" 
                 size="sm"
                 onClick={() => setIsCartModalOpen(true)}
-                className="relative"
+                className="relative hover:scale-110 transition-transform duration-200 hover-glow"
               >
                 <ShoppingBag className="w-4 h-4" />
                 {getTotalItems() > 0 && (
@@ -197,7 +201,7 @@ export const Navigation = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={() => openAuthModal('login')}
-                    className="hover:bg-primary/10 hover:text-primary transition-colors"
+                    className="hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105"
                   >
                     Sign In
                   </Button>
@@ -205,7 +209,7 @@ export const Navigation = () => {
                     variant="cultural" 
                     size="sm" 
                     onClick={() => openAuthModal('signup')}
-                    className="shadow-warm"
+                    className="shadow-warm hover:scale-105 transition-transform duration-200 hover-glow"
                   >
                     Join Now
                   </Button>
