@@ -86,50 +86,50 @@ export const Navigation = () => {
                   <span className="text-white font-bold text-lg">॰</span>
                 </div>
                 
-                {/* Logo and Brand with White Background */}
+                {/* Logo and Brand with Enhanced White Background */}
                 <div className="flex items-center gap-2">
-                  <div className="flex flex-col bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 shadow-sm">
+                  <div className="flex flex-col bg-white/95 backdrop-blur-md rounded-lg px-4 py-2 shadow-lg border border-white/50 group-hover:shadow-xl transition-all duration-300">
                     <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent hover:opacity-80 transition-opacity leading-tight">
                       KalaVerse
                     </h2>
-                    <div className="flex items-center gap-1 -mt-1">
-                      <span className="text-xs text-primary/60">✦</span>
-                      <span className="text-xs text-primary/80 font-medium tracking-wider">Sacred Art</span>
-                      <span className="text-xs text-primary/60">✦</span>
+                    <div className="flex items-center gap-1 -mt-1 justify-center">
+                      <span className="text-xs text-primary/70">✦</span>
+                      <span className="text-xs text-primary/90 font-semibold tracking-wider">Sacred Art</span>
+                      <span className="text-xs text-primary/70">✦</span>
                     </div>
                   </div>
                 </div>
               </Link>
             </div>
             
-            {/* Desktop Navigation with White Background Boxes */}
-            <div className="hidden md:flex items-center space-x-4">
+            {/* Desktop Navigation with Enhanced White Background Boxes */}
+            <div className="hidden md:flex items-center space-x-3">
               <button 
                 onClick={() => handleNavigation('categories')} 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-semibold hover:scale-105 bg-white/95 backdrop-blur-md rounded-lg px-4 py-2 shadow-md border border-white/30 hover:shadow-lg hover:border-primary/20"
               >
-                <span className="text-primary/60">❋</span>
+                <span className="text-primary/70">❋</span>
                 Categories
               </button>
               <button 
                 onClick={() => handleNavigation('gallery')} 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-semibold hover:scale-105 bg-white/95 backdrop-blur-md rounded-lg px-4 py-2 shadow-md border border-white/30 hover:shadow-lg hover:border-primary/20"
               >
-                <span className="text-primary/60">✦</span>
+                <span className="text-primary/70">✦</span>
                 Gallery
               </button>
               <button 
                 onClick={() => handleNavigation('artists')} 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-semibold hover:scale-105 bg-white/95 backdrop-blur-md rounded-lg px-4 py-2 shadow-md border border-white/30 hover:shadow-lg hover:border-primary/20"
               >
-                <span className="text-primary/60">❋</span>
+                <span className="text-primary/70">❋</span>
                 Artists
               </button>
               <Link 
                 to="/about" 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 font-semibold hover:scale-105 bg-white/95 backdrop-blur-md rounded-lg px-4 py-2 shadow-md border border-white/30 hover:shadow-lg hover:border-primary/20"
               >
-                <span className="text-primary/60">✦</span>
+                <span className="text-primary/70">✦</span>
                 About
               </Link>
             </div>
