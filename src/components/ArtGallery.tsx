@@ -6,8 +6,6 @@ import { Heart, ShoppingCart, Eye, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { useSearch } from "@/hooks/useSearch";
-import { SearchBar } from "@/components/search/SearchBar";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { artworks } from "@/data/artworks";
 
@@ -18,25 +16,22 @@ interface ArtGalleryProps {
 export const ArtGallery = ({ initialSearchQuery = '' }: ArtGalleryProps) => {
   const [likedArtworks, setLikedArtworks] = useState<number[]>([]);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const { addToCart } = useCart();
   
-  const {
-    searchQuery,
-    setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-    filteredItems: filteredArtworks,
-    categories,
-    hasResults,
-    totalResults
-  } = useSearch(artworks);
-
-  // Set initial search query if provided
-  useEffect(() => {
-    if (initialSearchQuery && initialSearchQuery !== searchQuery) {
-      setSearchQuery(initialSearchQuery);
-    }
-  }, [initialSearchQuery, searchQuery, setSearchQuery]);
+  const categories = ["All", "Warli Art", "Madhubani Art", "Pithora Art"];
+  
+  // Filter artworks based on search query and category
+  const filteredArtworks = artworks.filter(artwork => {
+    const matchesCategory = selectedCategory === "All" || artwork.category === selectedCategory;
+    const matchesSearch = !initialSearchQuery || 
+      artwork.title.toLowerCase().includes(initialSearchQuery.toLowerCase()) ||
+      artwork.artist.toLowerCase().includes(initialSearchQuery.toLowerCase()) ||
+      artwork.category.toLowerCase().includes(initialSearchQuery.toLowerCase()) ||
+      artwork.description.toLowerCase().includes(initialSearchQuery.toLowerCase());
+    
+    return matchesCategory && matchesSearch;
+  });
 
   const handleLike = (artworkId: number) => {
     setLikedArtworks(prev => {
@@ -76,51 +71,60 @@ export const ArtGallery = ({ initialSearchQuery = '' }: ArtGalleryProps) => {
     <section id="gallery" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">
             Explore Art Gallery
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in-up animation-delay-200">
             Discover authentic traditional artworks from talented local artists across India.
             Each piece tells a unique story of cultural heritage.
           </p>
-          
-          {/* Search Bar */}
-          <SearchBar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            categories={categories}
-            totalResults={totalResults}
-          />
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap justify-center gap-3 mb-12 animate-fade-in-up animation-delay-400">
+          {categories.map((category, index) => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? "cultural" : "outline"}
+              onClick={() => setSelectedCategory(category)}
+              className={`rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                selectedCategory === category ? 'animate-pulse-subtle' : ''
+              }`}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              {category}
+            </Button>
+          ))}
         </div>
 
         {/* Results */}
-        {!hasResults ? (
-          <div className="text-center py-12">
+        {filteredArtworks.length === 0 ? (
+          <div className="text-center py-12 animate-fade-in">
             <div className="text-muted-foreground mb-4">
-              <Eye className="w-16 h-16 mx-auto mb-4" />
+              <Eye className="w-16 h-16 mx-auto mb-4 animate-bounce" />
             </div>
             <h3 className="text-xl font-semibold mb-2">
               No artworks found
             </h3>
             <p className="text-muted-foreground mb-6">
-              Try adjusting your search terms or browse all categories
+              Try selecting a different category or browse all artworks
             </p>
             <Button 
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('All');
-              }}
+              onClick={() => setSelectedCategory('All')}
               variant="cultural"
+              className="hover:scale-105 transition-transform duration-200"
             >
               View All Artworks
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredArtworks.map((artwork) => (
-            <Card key={artwork.id} className="group hover:shadow-warm transition-all duration-300 overflow-hidden">
+            {filteredArtworks.map((artwork, index) => (
+            <Card 
+              key={artwork.id} 
+              className="group hover:shadow-warm transition-all duration-500 overflow-hidden animate-fade-in-up hover:scale-105 hover:-translate-y-2 hover-glow"
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
               <Link to={`/artwork/${artwork.id}`}>
                 <div className="relative cursor-pointer">
                   <img 

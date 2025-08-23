@@ -29,10 +29,10 @@ export const ArtCategories = () => {
     <section id="categories" className="py-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">
             Traditional Art Forms
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto animate-fade-in-up animation-delay-200">
             Explore the rich diversity of Indian folk art traditions, each telling unique stories 
             of cultural heritage and ancestral wisdom.
           </p>
@@ -40,8 +40,12 @@ export const ArtCategories = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category, index) => (
-            <Card key={index} className="group cursor-pointer hover:shadow-warm transition-all duration-300 overflow-hidden"
-                  onClick={() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' })}>
+            <Card 
+              key={index} 
+              className="group cursor-pointer hover:shadow-warm transition-all duration-500 overflow-hidden animate-fade-in-up hover:scale-105 hover:-translate-y-2 hover-glow"
+              style={{ animationDelay: `${(index + 1) * 200}ms` }}
+              onClick={() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               <div className="aspect-square overflow-hidden">
                 <img 
                   src={category.image} 

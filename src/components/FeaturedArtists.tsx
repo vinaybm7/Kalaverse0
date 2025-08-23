@@ -9,10 +9,10 @@ export const FeaturedArtists = () => {
     <section id="artists" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">
             Featured Artists
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto animate-fade-in-up animation-delay-200">
             Meet the talented artists preserving India's cultural heritage through their masterful 
             traditional art forms.
           </p>
@@ -20,7 +20,11 @@ export const FeaturedArtists = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {artists.slice(0, 3).map((artist, index) => (
-            <Card key={index} className="group hover:shadow-elegant transition-all duration-300">
+            <Card 
+              key={index} 
+              className="group hover:shadow-elegant transition-all duration-500 animate-fade-in-up hover:scale-105 hover:-translate-y-2 hover-glow"
+              style={{ animationDelay: `${(index + 1) * 200}ms` }}
+            >
               <div className="p-6">
                 <div className="flex items-center space-x-4 mb-4">
                   <img 
@@ -54,7 +58,7 @@ export const FeaturedArtists = () => {
                 </div>
                 
                 <Link to={`/artist/${artist.id}`}>
-                  <Button variant="secondary" className="w-full">
+                  <Button variant="secondary" className="w-full hover:scale-105 transition-transform duration-200">
                     View Profile
                   </Button>
                 </Link>

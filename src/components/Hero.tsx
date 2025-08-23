@@ -114,7 +114,7 @@ export const Hero = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="min-w-56 h-14 text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm shadow-xl hover:shadow-white/20 transition-all duration-300 transform hover:scale-105" 
+              className="min-w-56 h-14 text-lg font-semibold border-2 border-white/60 text-white hover:bg-white/20 hover:border-white/80 backdrop-blur-sm shadow-xl hover:shadow-white/30 transition-all duration-300 transform hover:scale-105" 
               onClick={handleBecomeArtist}
             >
               <Heart className="w-5 h-5 mr-2" />
