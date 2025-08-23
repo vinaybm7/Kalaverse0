@@ -40,23 +40,11 @@ export const Navigation = () => {
   };
 
   const handleNavigation = (section: string) => {
-    // If we're on the dashboard, navigate to home first then scroll to section
+    // Simple navigation without scrolling
     if (location.pathname === '/dashboard') {
       navigate('/');
-      // Small delay to ensure navigation completes before scrolling
-      setTimeout(() => {
-        const element = document.getElementById(section);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } else {
-      // If we're already on home page, just scroll to section
-      const element = document.getElementById(section);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
     }
+    // Remove scroll functionality
   };
 
   return (

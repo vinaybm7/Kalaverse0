@@ -12,13 +12,7 @@ const Index = () => {
   const searchQuery = searchParams.get('search');
 
   useEffect(() => {
-    // If there's a search query, scroll to the gallery section
-    if (searchQuery) {
-      const gallerySection = document.getElementById('gallery');
-      if (gallerySection) {
-        gallerySection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
+    // Removed scroll functionality for search queries
   }, [searchQuery]);
 
   return (

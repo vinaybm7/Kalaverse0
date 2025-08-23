@@ -10,14 +10,13 @@ export const Hero = () => {
   const { user } = useAuth();
 
   const handleExploreGallery = () => {
-    document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' });
+    // Removed scroll functionality
   };
 
   const handleBecomeArtist = () => {
     if (user) {
       // If user is logged in, redirect to artist dashboard or profile
-      // For now, just scroll to gallery
-      handleExploreGallery();
+      // Removed scroll functionality
     } else {
       // If not logged in, open signup modal
       setIsAuthModalOpen(true);
@@ -139,12 +138,7 @@ export const Hero = () => {
           </div>
         </div>
         
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center backdrop-blur-sm">
-            <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse" />
-          </div>
-        </div>
+        {/* Scroll Indicator Removed */}
       </section>
 
       {/* Auth Modal for Become an Artist */}
