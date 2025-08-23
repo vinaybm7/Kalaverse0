@@ -64,10 +64,28 @@ export const Navigation = () => {
             
             {/* Search and Actions */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  toast({
+                    title: "Search",
+                    description: "Search functionality coming soon!"
+                  });
+                }}
+              >
                 <Search className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  toast({
+                    title: "Shopping Cart",
+                    description: "Cart functionality coming soon!"
+                  });
+                }}
+              >
                 <ShoppingBag className="w-4 h-4" />
               </Button>
               

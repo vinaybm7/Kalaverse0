@@ -7,6 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { WishlistModal } from "@/components/dashboard/WishlistModal";
+import { ProfileEditModal } from "@/components/dashboard/ProfileEditModal";
+import { UploadArtworkModal } from "@/components/dashboard/UploadArtworkModal";
+import { SalesManagementModal } from "@/components/dashboard/SalesManagementModal";
 import { 
   User, 
   Heart, 
@@ -24,24 +28,41 @@ import {
 const Dashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+  
+  // Modal states
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
+  const [isUploadArtworkOpen, setIsUploadArtworkOpen] = useState(false);
+  const [isSalesManagementOpen, setIsSalesManagementOpen] = useState(false);
 
+  // Get user type from metadata
+  const userType = user?.user_metadata?.user_type || "buyer";
+  const isArtist = userType === "artist";
+  
   // Mock user data - in real app, fetch from API
   const userData = {
     profile: {
-      name: user?.user_metadata?.full_name || "Art Enthusiast",
+      name: user?.user_metadata?.full_name || (isArtist ? "Traditional Artist" : "Art Enthusiast"),
       email: user?.email || "",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-      userType: user?.user_metadata?.user_type || "Art Enthusiast",
+      avatar: isArtist 
+        ? "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+        : "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+      userType: isArtist ? "Traditional Artist" : "Art Enthusiast",
       joinedDate: "2024",
-      location: "Mumbai, India"
+      location: isArtist ? "Jaipur, Rajasthan" : "Mumbai, India"
     },
-    stats: {
+    stats: isArtist ? {
       artworks: 12,
       likes: 234,
       views: 1567,
       followers: 89
+    } : {
+      favorites: 8,
+      purchases: 5,
+      reviews: 12,
+      following: 23
     },
-    myArtworks: [
+    myArtworks: isArtist ? [
       {
         id: 1,
         title: "Sunset Mandala",
@@ -59,8 +80,17 @@ const Dashboard = () => {
         likes: 0,
         views: 0,
         price: "₹12,000"
+      },
+      {
+        id: 3,
+        title: "Peacock Feathers",
+        image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=300&fit=crop",
+        status: "Published",
+        likes: 67,
+        views: 456,
+        price: "₹15,000"
       }
-    ],
+    ] : [],
     favorites: [
       {
         id: 1,
@@ -77,14 +107,34 @@ const Dashboard = () => {
         price: "₹10,000"
       }
     ],
-    orders: [
+    orders: isArtist ? [
+      {
+        id: "SALE001",
+        artwork: "Sunset Mandala",
+        buyer: "Priya Sharma",
+        amount: "₹8,000",
+        status: "Completed",
+        date: "2024-01-18",
+        type: "sale"
+      },
+      {
+        id: "SALE002", 
+        artwork: "Peacock Feathers",
+        buyer: "Raj Kumar",
+        amount: "₹15,000",
+        status: "Processing",
+        date: "2024-01-22",
+        type: "sale"
+      }
+    ] : [
       {
         id: "ORD001",
         artwork: "Lotus Bloom",
         artist: "Meera Patel",
         amount: "₹7,500",
         status: "Delivered",
-        date: "2024-01-15"
+        date: "2024-01-15",
+        type: "purchase"
       },
       {
         id: "ORD002",
@@ -92,7 +142,8 @@ const Dashboard = () => {
         artist: "Arjun Singh",
         amount: "₹12,000",
         status: "In Transit",
-        date: "2024-01-20"
+        date: "2024-01-20",
+        type: "purchase"
       }
     ]
   };
@@ -149,16 +200,16 @@ const Dashboard = () => {
                     Namaste, {userData.profile.name}! 🙏
                   </h1>
                   <p className="text-gray-600 text-lg">
-                    {userData.profile.userType === 'artist' 
-                      ? 'Continue creating beautiful traditional art' 
-                      : 'Discover the beauty of Indian heritage art'
+                    {isArtist 
+                      ? 'Continue creating beautiful traditional art and sharing your heritage' 
+                      : 'Discover and collect the beauty of Indian heritage art'
                     }
                   </p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-4">
                   <Badge className="bg-gradient-cultural text-white shadow-sm">
-                    {userData.profile.userType === 'artist' ? '🎨 Traditional Artist' : '❤️ Art Enthusiast'}
+                    {isArtist ? '🎨 Traditional Artist' : '❤️ Art Enthusiast'}
                   </Badge>
                   <span className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
@@ -168,30 +219,52 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
-                    <div className="text-2xl font-bold text-orange-600">{userData.stats.artworks}</div>
-                    <div className="text-sm text-gray-600">
-                      {userData.profile.userType === 'artist' ? 'Artworks' : 'Favorites'}
-                    </div>
-                  </div>
-                  <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
-                    <div className="text-2xl font-bold text-red-600">{userData.stats.likes}</div>
-                    <div className="text-sm text-gray-600">Likes</div>
-                  </div>
-                  <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
-                    <div className="text-2xl font-bold text-yellow-600">{userData.stats.views}</div>
-                    <div className="text-sm text-gray-600">Views</div>
-                  </div>
-                  <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
-                    <div className="text-2xl font-bold text-purple-600">{userData.stats.followers}</div>
-                    <div className="text-sm text-gray-600">
-                      {userData.profile.userType === 'artist' ? 'Followers' : 'Following'}
-                    </div>
-                  </div>
+                  {isArtist ? (
+                    <>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-orange-600">{userData.stats.artworks}</div>
+                        <div className="text-sm text-gray-600">Artworks</div>
+                      </div>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-red-600">{userData.stats.likes}</div>
+                        <div className="text-sm text-gray-600">Total Likes</div>
+                      </div>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-yellow-600">{userData.stats.views}</div>
+                        <div className="text-sm text-gray-600">Profile Views</div>
+                      </div>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-purple-600">{userData.stats.followers}</div>
+                        <div className="text-sm text-gray-600">Followers</div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-orange-600">{userData.stats.favorites}</div>
+                        <div className="text-sm text-gray-600">Favorites</div>
+                      </div>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-red-600">{userData.stats.purchases}</div>
+                        <div className="text-sm text-gray-600">Purchases</div>
+                      </div>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-yellow-600">{userData.stats.reviews}</div>
+                        <div className="text-sm text-gray-600">Reviews</div>
+                      </div>
+                      <div className="text-center p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="text-2xl font-bold text-purple-600">{userData.stats.following}</div>
+                        <div className="text-sm text-gray-600">Following</div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
-              <Button className="bg-gradient-cultural hover:shadow-warm transition-all duration-300">
+              <Button 
+                className="bg-gradient-cultural hover:shadow-warm transition-all duration-300"
+                onClick={() => setIsProfileEditOpen(true)}
+              >
                 <Settings className="w-4 h-4 mr-2" />
                 Edit Profile
               </Button>
@@ -216,7 +289,7 @@ const Dashboard = () => {
             >
               <Upload className="w-4 h-4" />
               <span className="hidden sm:inline">
-                {userData.profile.userType === 'artist' ? 'My Art' : 'Collection'}
+                {isArtist ? 'My Artworks' : 'My Collection'}
               </span>
               <span className="sm:hidden">Art</span>
             </TabsTrigger>
@@ -233,8 +306,8 @@ const Dashboard = () => {
               className="flex items-center gap-2 data-[state=active]:bg-gradient-cultural data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-200"
             >
               <ShoppingCart className="w-4 h-4" />
-              <span className="hidden sm:inline">Orders</span>
-              <span className="sm:hidden">Cart</span>
+              <span className="hidden sm:inline">{isArtist ? 'Sales' : 'Orders'}</span>
+              <span className="sm:hidden">{isArtist ? '💰' : '🛒'}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -249,21 +322,43 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
-                      <Heart className="w-4 h-4 text-red-500" />
-                      <span className="text-sm">Someone liked your "Sunset Mandala"</span>
-                      <span className="text-xs text-gray-500 ml-auto">2h ago</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span className="text-sm">New follower: Raj Kumar</span>
-                      <span className="text-xs text-gray-500 ml-auto">5h ago</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
-                      <Eye className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm">Your art was viewed 50 times today</span>
-                      <span className="text-xs text-gray-500 ml-auto">1d ago</span>
-                    </div>
+                    {isArtist ? (
+                      <>
+                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
+                          <Heart className="w-4 h-4 text-red-500" />
+                          <span className="text-sm">Someone liked your "Sunset Mandala"</span>
+                          <span className="text-xs text-gray-500 ml-auto">2h ago</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
+                          <Star className="w-4 h-4 text-yellow-500" />
+                          <span className="text-sm">New follower: Raj Kumar</span>
+                          <span className="text-xs text-gray-500 ml-auto">5h ago</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
+                          <ShoppingCart className="w-4 h-4 text-green-500" />
+                          <span className="text-sm">Sold "Peacock Feathers" for ₹15,000</span>
+                          <span className="text-xs text-gray-500 ml-auto">1d ago</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
+                          <Heart className="w-4 h-4 text-red-500" />
+                          <span className="text-sm">Added "Royal Procession" to favorites</span>
+                          <span className="text-xs text-gray-500 ml-auto">2h ago</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
+                          <ShoppingCart className="w-4 h-4 text-green-500" />
+                          <span className="text-sm">Purchased "Lotus Bloom" by Meera Patel</span>
+                          <span className="text-xs text-gray-500 ml-auto">5h ago</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
+                          <Star className="w-4 h-4 text-yellow-500" />
+                          <span className="text-sm">Started following Arjun Singh</span>
+                          <span className="text-xs text-gray-500 ml-auto">1d ago</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -276,44 +371,64 @@ const Dashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button 
-                    className="w-full justify-start bg-gradient-cultural hover:shadow-warm text-white" 
-                    onClick={() => {
-                      toast({
-                        title: "Upload Artwork",
-                        description: "Upload feature coming soon! Share your traditional art with the world."
-                      })
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Upload New Artwork
-                  </Button>
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => {
-                      toast({
-                        title: "Edit Profile",
-                        description: "Profile editing feature coming soon!"
-                      })
-                    }}
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => {
-                      toast({
-                        title: "Account Settings",
-                        description: "Settings panel coming soon!"
-                      })
-                    }}
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Account Settings
-                  </Button>
+                  {isArtist ? (
+                    <>
+                      <Button 
+                        className="w-full justify-start bg-gradient-cultural hover:shadow-warm text-white" 
+                        onClick={() => setIsUploadArtworkOpen(true)}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Upload New Artwork
+                      </Button>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={() => setIsSalesManagementOpen(true)}
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Manage Sales
+                      </Button>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={() => setIsProfileEditOpen(true)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Artist Profile
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button 
+                        className="w-full justify-start bg-gradient-cultural hover:shadow-warm text-white" 
+                        onClick={() => {
+                          toast({
+                            title: "Browse Gallery",
+                            description: "Discover beautiful traditional artworks!"
+                          })
+                        }}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Browse Gallery
+                      </Button>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={() => setIsWishlistOpen(true)}
+                      >
+                        <Heart className="w-4 h-4 mr-2" />
+                        My Wishlist
+                      </Button>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={() => setIsProfileEditOpen(true)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
@@ -342,7 +457,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex justify-between items-center p-2 rounded-lg bg-white/50">
                       <span className="text-sm text-gray-600">
-                        {userData.profile.userType === 'artist' ? 'Sales' : 'Purchases'}
+                        {isArtist ? 'Sales' : 'Purchases'}
                       </span>
                       <div className="text-right">
                         <span className="font-semibold text-orange-600">₹25,000</span>
@@ -358,26 +473,29 @@ const Dashboard = () => {
           <TabsContent value="artworks" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent">
-                {userData.profile.userType === 'artist' ? 'My Artworks' : 'My Collection'}
+                {isArtist ? 'My Artworks' : 'My Collection'}
               </h2>
               <Button 
                 className="bg-gradient-cultural hover:shadow-warm transition-all duration-300"
                 onClick={() => {
-                  toast({
-                    title: userData.profile.userType === 'artist' ? "Upload Artwork" : "Browse Gallery",
-                    description: userData.profile.userType === 'artist' 
-                      ? "Upload feature coming soon! Share your traditional art with the world."
-                      : "Discover beautiful traditional artworks in our gallery."
-                  })
+                  if (isArtist) {
+                    setIsUploadArtworkOpen(true);
+                  } else {
+                    toast({
+                      title: "Browse Gallery",
+                      description: "Discover beautiful traditional artworks in our gallery."
+                    });
+                  }
                 }}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {userData.profile.userType === 'artist' ? 'Upload New Art' : 'Add to Collection'}
+                {isArtist ? 'Upload New Art' : 'Browse Gallery'}
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {userData.myArtworks.map((artwork) => (
+            {isArtist ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {userData.myArtworks.map((artwork) => (
                 <Card key={artwork.id} className="overflow-hidden hover:shadow-warm transition-all duration-300 group">
                   <div className="relative">
                     <img 
@@ -445,6 +563,31 @@ const Dashboard = () => {
                 </Card>
               ))}
             </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="w-24 h-24 bg-gradient-cultural rounded-full flex items-center justify-center mx-auto mb-4 opacity-20">
+                    <Heart className="w-12 h-12 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Start Your Collection</h3>
+                  <p className="text-gray-600 mb-6">
+                    Discover and collect beautiful traditional Indian artworks from talented artists across the country.
+                  </p>
+                  <Button 
+                    className="bg-gradient-cultural hover:shadow-warm transition-all duration-300"
+                    onClick={() => {
+                      toast({
+                        title: "Browse Gallery",
+                        description: "Redirecting to our beautiful art gallery!"
+                      })
+                    }}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Explore Gallery
+                  </Button>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="favorites" className="space-y-6">
@@ -525,19 +668,21 @@ const Dashboard = () => {
           <TabsContent value="orders" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent">
-                Order History 🛒
+                {isArtist ? 'Sales History 💰' : 'Order History 🛒'}
               </h2>
               <Button 
                 variant="outline" 
                 className="border-orange-200 hover:bg-orange-50"
                 onClick={() => {
                   toast({
-                    title: "Browse Gallery",
-                    description: "Discover more artworks to add to your collection!"
+                    title: isArtist ? "Upload More Art" : "Browse Gallery",
+                    description: isArtist 
+                      ? "Upload more artworks to increase your sales!"
+                      : "Discover more artworks to add to your collection!"
                   })
                 }}
               >
-                Shop More Art
+                {isArtist ? 'Upload More Art' : 'Shop More Art'}
               </Button>
             </div>
             
@@ -558,10 +703,10 @@ const Dashboard = () => {
                         </p>
                         <p className="text-sm text-gray-500 flex items-center gap-1">
                           <User className="w-3 h-3" />
-                          by {order.artist}
+                          {isArtist ? `sold to ${order.buyer || order.artist}` : `by ${order.artist || order.buyer}`}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          Ordered on {order.date}
+                          {isArtist ? `Sold on ${order.date}` : `Ordered on ${order.date}`}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
@@ -591,20 +736,38 @@ const Dashboard = () => {
                           >
                             View Details
                           </Button>
-                          {order.status === 'Delivered' && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="border-green-200 hover:bg-green-50 text-green-700"
-                              onClick={() => {
-                                toast({
-                                  title: "Rate Artwork",
-                                  description: "Share your experience with this artwork!"
-                                })
-                              }}
-                            >
-                              Rate & Review
-                            </Button>
+                          {isArtist ? (
+                            order.status === 'Completed' && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="border-green-200 hover:bg-green-50 text-green-700"
+                                onClick={() => {
+                                  toast({
+                                    title: "View Sale Details",
+                                    description: "Viewing detailed sale information!"
+                                  })
+                                }}
+                              >
+                                Sale Details
+                              </Button>
+                            )
+                          ) : (
+                            order.status === 'Delivered' && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="border-green-200 hover:bg-green-50 text-green-700"
+                                onClick={() => {
+                                  toast({
+                                    title: "Rate Artwork",
+                                    description: "Share your experience with this artwork!"
+                                  })
+                                }}
+                              >
+                                Rate & Review
+                              </Button>
+                            )
                           )}
                         </div>
                       </div>
@@ -618,6 +781,24 @@ const Dashboard = () => {
       </div>
 
       <Footer />
+      
+      {/* Modals */}
+      <WishlistModal 
+        isOpen={isWishlistOpen} 
+        onClose={() => setIsWishlistOpen(false)} 
+      />
+      <ProfileEditModal 
+        isOpen={isProfileEditOpen} 
+        onClose={() => setIsProfileEditOpen(false)} 
+      />
+      <UploadArtworkModal 
+        isOpen={isUploadArtworkOpen} 
+        onClose={() => setIsUploadArtworkOpen(false)} 
+      />
+      <SalesManagementModal 
+        isOpen={isSalesManagementOpen} 
+        onClose={() => setIsSalesManagementOpen(false)} 
+      />
     </main>
   );
 };
