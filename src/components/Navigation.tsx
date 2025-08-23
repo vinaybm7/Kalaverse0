@@ -83,12 +83,16 @@ export const Navigation = () => {
               <Link to="/" className="flex items-center gap-3 group">
                 {/* Complete Logo Container with White Background */}
                 <div className="flex items-center gap-3 bg-white/95 backdrop-blur-md rounded-xl px-4 py-2 shadow-lg border border-white/50 group-hover:shadow-xl transition-all duration-300">
-                  {/* Traditional Symbol */}
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-cultural shadow-md group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-white font-bold text-lg">॰</span>
+                  {/* Actual Logo Image */}
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-md group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+                    <img 
+                      src="/logo.png" 
+                      alt="KalaVerse Logo" 
+                      className="w-8 h-8 object-contain"
+                    />
                   </div>
                   
-                  {/* Logo and Brand Text */}
+                  {/* Brand Text */}
                   <div className="flex flex-col">
                     <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent hover:opacity-80 transition-opacity leading-tight">
                       KalaVerse
