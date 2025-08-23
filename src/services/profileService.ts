@@ -72,23 +72,46 @@ export class ProfileService {
 
   // Upload avatar
   static async uploadAvatar(file: File, userId: string): Promise<string | null> {
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${userId}/avatar.${fileExt}`
+    try {
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        throw new Error('File must be an image')
+      }
 
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(fileName, file, { upsert: true })
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        throw new Error('File size must be less than 5MB')
+      }
 
-    if (uploadError) {
-      console.error('Error uploading avatar:', uploadError)
-      throw uploadError
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${userId}/avatar.${fileExt}`
+
+      console.log('Uploading avatar:', fileName)
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { 
+          cacheControl: '3600',
+          upsert: true 
+        })
+
+      if (uploadError) {
+        console.error('Error uploading avatar:', uploadError)
+        throw new Error(`Avatar upload failed: ${uploadError.message}`)
+      }
+
+      console.log('Avatar upload successful:', data)
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName)
+
+      console.log('Avatar public URL generated:', urlData.publicUrl)
+
+      return urlData.publicUrl
+    } catch (error) {
+      console.error('Avatar upload error:', error)
+      throw error
     }
-
-    const { data } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(fileName)
-
-    return data.publicUrl
   }
 
   // Get artist profiles with pagination

@@ -4,23 +4,46 @@ import { Artwork, ArtworkInsert, ArtworkUpdate, ArtworkWithArtist } from '@/type
 export class ArtworkService {
   // Upload artwork image
   static async uploadArtworkImage(file: File, artistId: string): Promise<string | null> {
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${artistId}/${Date.now()}.${fileExt}`
+    try {
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        throw new Error('File must be an image')
+      }
 
-    const { error: uploadError } = await supabase.storage
-      .from('artwork-images')
-      .upload(fileName, file)
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        throw new Error('File size must be less than 10MB')
+      }
 
-    if (uploadError) {
-      console.error('Error uploading artwork image:', uploadError)
-      throw uploadError
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${artistId}/${Date.now()}.${fileExt}`
+
+      console.log('Uploading artwork image:', fileName)
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('artwork-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadError) {
+        console.error('Error uploading artwork image:', uploadError)
+        throw new Error(`Upload failed: ${uploadError.message}`)
+      }
+
+      console.log('Upload successful:', data)
+
+      const { data: urlData } = supabase.storage
+        .from('artwork-images')
+        .getPublicUrl(fileName)
+
+      console.log('Public URL generated:', urlData.publicUrl)
+
+      return urlData.publicUrl
+    } catch (error) {
+      console.error('Artwork image upload error:', error)
+      throw error
     }
-
-    const { data } = supabase.storage
-      .from('artwork-images')
-      .getPublicUrl(fileName)
-
-    return data.publicUrl
   }
 
   // Create artwork with image upload
