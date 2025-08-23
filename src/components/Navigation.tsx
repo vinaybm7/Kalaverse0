@@ -62,9 +62,9 @@ export const Navigation = () => {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-50/95 via-yellow-50/95 to-red-50/95 backdrop-blur-md border-b-2 border-gradient-cultural relative overflow-hidden shadow-warm">
-        {/* Traditional Art Pattern Overlay */}
-        <div className="absolute inset-0 opacity-8 pointer-events-none">
-          <div className="traditional-pattern-bg h-full w-full"></div>
+        {/* Traditional Art Pattern Overlay - Static */}
+        <div className="absolute inset-0 opacity-3 pointer-events-none">
+          <div className="traditional-pattern-bg-static h-full w-full"></div>
         </div>
         
         {/* Traditional Border Decorations */}
@@ -86,9 +86,9 @@ export const Navigation = () => {
                   <span className="text-white font-bold text-lg">॰</span>
                 </div>
                 
-                {/* Logo and Brand */}
+                {/* Logo and Brand with White Background */}
                 <div className="flex items-center gap-2">
-                  <div className="flex flex-col">
+                  <div className="flex flex-col bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 shadow-sm">
                     <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent hover:opacity-80 transition-opacity leading-tight">
                       KalaVerse
                     </h2>
@@ -102,37 +102,34 @@ export const Navigation = () => {
               </Link>
             </div>
             
-            {/* Desktop Navigation with Traditional Separators */}
-            <div className="hidden md:flex items-center space-x-6">
+            {/* Desktop Navigation with White Background Boxes */}
+            <div className="hidden md:flex items-center space-x-4">
               <button 
                 onClick={() => handleNavigation('categories')} 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
               >
-                <span className="text-primary/40">❋</span>
+                <span className="text-primary/60">❋</span>
                 Categories
               </button>
-              <div className="text-primary/30">|</div>
               <button 
                 onClick={() => handleNavigation('gallery')} 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
               >
-                <span className="text-primary/40">✦</span>
+                <span className="text-primary/60">✦</span>
                 Gallery
               </button>
-              <div className="text-primary/30">|</div>
               <button 
                 onClick={() => handleNavigation('artists')} 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
               >
-                <span className="text-primary/40">❋</span>
+                <span className="text-primary/60">❋</span>
                 Artists
               </button>
-              <div className="text-primary/30">|</div>
               <Link 
                 to="/about" 
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 font-medium hover:scale-105"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 font-medium hover:scale-105 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm"
               >
-                <span className="text-primary/40">✦</span>
+                <span className="text-primary/60">✦</span>
                 About
               </Link>
             </div>

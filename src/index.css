@@ -231,6 +231,21 @@ All colors MUST be HSL.
     animation: patternMove 25s linear infinite;
   }
 
+  /* Static Traditional Art Pattern for Header */
+  .traditional-pattern-bg-static {
+    background-image: 
+      /* Warli-inspired dots */
+      radial-gradient(circle at 15% 25%, hsl(var(--primary)) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 85% 75%, hsl(var(--primary)) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 45% 15%, hsl(var(--primary)) 1px, transparent 1px),
+      radial-gradient(circle at 75% 45%, hsl(var(--primary)) 1px, transparent 1px),
+      /* Madhubani-inspired geometric lines */
+      linear-gradient(45deg, transparent 48%, hsl(var(--primary)) 48%, hsl(var(--primary)) 52%, transparent 52%),
+      linear-gradient(-45deg, transparent 48%, hsl(var(--primary)) 48%, hsl(var(--primary)) 52%, transparent 52%);
+    background-size: 50px 50px, 50px 50px, 25px 25px, 25px 25px, 80px 80px, 80px 80px;
+    background-position: 0 0, 25px 25px, 12px 12px, 37px 37px, 0 0, 40px 40px;
+  }
+
   @keyframes patternMove {
     0% {
       background-position: 0 0, 25px 25px, 12px 12px, 37px 37px, 0 0, 40px 40px, 30px 30px, 30px 30px;
