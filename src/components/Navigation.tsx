@@ -108,13 +108,32 @@ export const Navigation = () => {
             
             {/* Search and Actions */}
             <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search artworks..."
+                    className="w-64 pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const searchQuery = (e.target as HTMLInputElement).value;
+                        if (searchQuery.trim()) {
+                          navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </div>
               <Button 
                 variant="ghost" 
                 size="sm"
+                className="md:hidden"
                 onClick={() => {
                   toast({
                     title: "Search",
-                    description: "Search functionality coming soon!"
+                    description: "Use the search bar in the gallery section!"
                   });
                 }}
               >

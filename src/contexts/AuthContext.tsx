@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { supabase, getAuthRedirectURL } from '@/lib/supabase'
 
 interface AuthContextType {
   user: User | null
@@ -52,7 +52,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       email,
       password,
       options: {
-        data: userData
+        data: userData,
+        emailRedirectTo: getAuthRedirectURL('/dashboard')
       }
     })
     return { data, error }
@@ -71,7 +72,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const resetPassword = async (email: string) => {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email)
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getAuthRedirectURL('/dashboard')
+    })
     return { data, error }
   }
 

@@ -3,9 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart, Eye, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { useSearch } from "@/hooks/useSearch";
+import { SearchBar } from "@/components/search/SearchBar";
 
 const artworks = [
   {
@@ -82,16 +84,31 @@ const artworks = [
   }
 ];
 
-export const ArtGallery = () => {
+interface ArtGalleryProps {
+  initialSearchQuery?: string;
+}
+
+export const ArtGallery = ({ initialSearchQuery = '' }: ArtGalleryProps) => {
   const [likedArtworks, setLikedArtworks] = useState<number[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const { addToCart } = useCart();
+  
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    filteredItems: filteredArtworks,
+    categories,
+    hasResults,
+    totalResults
+  } = useSearch(artworks);
 
-  const categories = ["All", "Warli Art", "Madhubani Art", "Pithora Art"];
-
-  const filteredArtworks = selectedCategory === "All" 
-    ? artworks 
-    : artworks.filter(artwork => artwork.category === selectedCategory);
+  // Set initial search query if provided
+  useEffect(() => {
+    if (initialSearchQuery && initialSearchQuery !== searchQuery) {
+      setSearchQuery(initialSearchQuery);
+    }
+  }, [initialSearchQuery, searchQuery, setSearchQuery]);
 
   const handleLike = (artworkId: number) => {
     setLikedArtworks(prev => {
@@ -131,29 +148,47 @@ export const ArtGallery = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Explore Art Gallery
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
             Discover authentic traditional artworks from talented local artists across India.
             Each piece tells a unique story of cultural heritage.
           </p>
+          
+          {/* Search Bar */}
+          <SearchBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            categories={categories}
+            totalResults={totalResults}
+          />
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "cultural" : "outline"}
-              onClick={() => setSelectedCategory(category)}
-              className="rounded-full"
+        {/* Results */}
+        {!hasResults ? (
+          <div className="text-center py-12">
+            <div className="text-muted-foreground mb-4">
+              <Eye className="w-16 h-16 mx-auto mb-4" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">
+              No artworks found
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Try adjusting your search terms or browse all categories
+            </p>
+            <Button 
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('All');
+              }}
+              variant="cultural"
             >
-              {category}
+              View All Artworks
             </Button>
-          ))}
-        </div>
-
-        {/* Art Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredArtworks.map((artwork) => (
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredArtworks.map((artwork) => (
             <Card key={artwork.id} className="group hover:shadow-warm transition-all duration-300 overflow-hidden">
               <Link to={`/artwork/${artwork.id}`}>
                 <div className="relative cursor-pointer">
@@ -239,8 +274,9 @@ export const ArtGallery = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
