@@ -61,51 +61,78 @@ export const Navigation = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border relative overflow-hidden">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-50/95 via-yellow-50/95 to-red-50/95 backdrop-blur-md border-b-2 border-gradient-cultural relative overflow-hidden shadow-warm">
         {/* Traditional Art Pattern Overlay */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0 opacity-8 pointer-events-none">
           <div className="traditional-pattern-bg h-full w-full"></div>
         </div>
+        
+        {/* Traditional Border Decorations */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400"></div>
+        
+        {/* Traditional Corner Symbols */}
+        <div className="absolute top-2 left-4 text-primary/20 text-xs">❋</div>
+        <div className="absolute top-2 right-4 text-primary/20 text-xs">❋</div>
+        <div className="absolute bottom-2 left-4 text-primary/20 text-xs">✦</div>
+        <div className="absolute bottom-2 right-4 text-primary/20 text-xs">✦</div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+            {/* Logo with Traditional Elements */}
             <div className="flex items-center">
-              <Link to="/" className="flex items-center gap-2">
-                <img 
-                  src="/logo.png" 
-                  alt="KalaVerse Logo" 
-                  className="h-8 w-auto hover:opacity-80 transition-opacity"
-                />
-                <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-                  KalaVerse
-                </h2>
+              <Link to="/" className="flex items-center gap-3 group">
+                {/* Traditional Symbol */}
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-cultural shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-bold text-lg">॰</span>
+                </div>
+                
+                {/* Logo and Brand */}
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col">
+                    <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent hover:opacity-80 transition-opacity leading-tight">
+                      KalaVerse
+                    </h2>
+                    <div className="flex items-center gap-1 -mt-1">
+                      <span className="text-xs text-primary/60">✦</span>
+                      <span className="text-xs text-primary/80 font-medium tracking-wider">Sacred Art</span>
+                      <span className="text-xs text-primary/60">✦</span>
+                    </div>
+                  </div>
+                </div>
               </Link>
             </div>
             
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            {/* Desktop Navigation with Traditional Separators */}
+            <div className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={() => handleNavigation('categories')} 
-                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105"
               >
+                <span className="text-primary/40">❋</span>
                 Categories
               </button>
+              <div className="text-primary/30">|</div>
               <button 
                 onClick={() => handleNavigation('gallery')} 
-                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105"
               >
+                <span className="text-primary/40">✦</span>
                 Gallery
               </button>
+              <div className="text-primary/30">|</div>
               <button 
                 onClick={() => handleNavigation('artists')} 
-                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 cursor-pointer font-medium hover:scale-105"
               >
+                <span className="text-primary/40">❋</span>
                 Artists
               </button>
+              <div className="text-primary/30">|</div>
               <Link 
                 to="/about" 
-                className="text-foreground hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-all duration-300 font-medium hover:scale-105"
               >
+                <span className="text-primary/40">✦</span>
                 About
               </Link>
             </div>
