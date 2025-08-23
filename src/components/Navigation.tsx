@@ -162,7 +162,7 @@ export const Navigation = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                className="md:hidden hover:scale-110 transition-transform duration-200 bg-white/95 backdrop-blur-md shadow-md border border-white/30 hover:shadow-lg"
+                className="md:hidden hover:scale-110 transition-transform duration-200 bg-white/95 backdrop-blur-md shadow-md border border-white/30 hover:shadow-lg text-gray-800"
                 onClick={() => {
                   const searchQuery = prompt("Search artworks:");
                   if (searchQuery?.trim()) {
@@ -176,7 +176,7 @@ export const Navigation = () => {
                 variant="ghost" 
                 size="sm"
                 onClick={() => setIsCartModalOpen(true)}
-                className="relative hover:scale-110 transition-transform duration-200 hover-glow bg-white/95 backdrop-blur-md shadow-md border border-white/30 hover:shadow-lg"
+                className="relative hover:scale-110 transition-transform duration-200 hover-glow bg-white/95 backdrop-blur-md shadow-md border border-white/30 hover:shadow-lg text-gray-800"
               >
                 <ShoppingBag className="w-4 h-4" />
                 {getTotalItems() > 0 && (
@@ -230,7 +230,7 @@ export const Navigation = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={() => openAuthModal('login')}
-                    className="hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105 bg-white/95 backdrop-blur-md shadow-md border border-white/30 hover:shadow-lg font-semibold"
+                    className="hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105 bg-white/95 backdrop-blur-md shadow-md border border-white/30 hover:shadow-lg font-semibold text-gray-800 hover:text-primary"
                   >
                     Sign In
                   </Button>
@@ -238,7 +238,7 @@ export const Navigation = () => {
                     variant="cultural" 
                     size="sm" 
                     onClick={() => openAuthModal('signup')}
-                    className="shadow-warm hover:scale-105 transition-transform duration-200 hover-glow bg-white/95 backdrop-blur-md border border-white/30 hover:shadow-lg font-semibold"
+                    className="shadow-warm hover:scale-105 transition-transform duration-200 hover-glow bg-white/95 backdrop-blur-md border border-white/30 hover:shadow-lg font-semibold text-gray-800"
                   >
                     Join Now
                   </Button>
