@@ -11,6 +11,9 @@ import { WishlistModal } from "@/components/dashboard/WishlistModal";
 import { ProfileEditModal } from "@/components/dashboard/ProfileEditModal";
 import { UploadArtworkModal } from "@/components/dashboard/UploadArtworkModal";
 import { SalesManagementModal } from "@/components/dashboard/SalesManagementModal";
+import { ExportComplianceModal } from "@/components/export/ExportComplianceModal";
+import { ExportComplianceWizard } from "@/components/export/ExportComplianceWizard";
+import { ExportStatusTracker } from "@/components/export/ExportStatusTracker";
 import { 
   User, 
   Heart, 
@@ -22,7 +25,8 @@ import {
   Edit,
   Trash2,
   Plus,
-  MapPin
+  MapPin,
+  Globe
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -34,6 +38,10 @@ const Dashboard = () => {
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
   const [isUploadArtworkOpen, setIsUploadArtworkOpen] = useState(false);
   const [isSalesManagementOpen, setIsSalesManagementOpen] = useState(false);
+  const [isExportComplianceOpen, setIsExportComplianceOpen] = useState(false);
+  const [isExportWizardOpen, setIsExportWizardOpen] = useState(false);
+  const [isExportStatusOpen, setIsExportStatusOpen] = useState(false);
+  const [exportWizardType, setExportWizardType] = useState("");
 
   // Get user type from metadata
   const userType = user?.user_metadata?.user_type || "buyer";
@@ -396,6 +404,13 @@ const Dashboard = () => {
                         <Edit className="w-4 h-4 mr-2" />
                         Edit Artist Profile
                       </Button>
+                      <Button 
+                        className="w-full justify-start bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white" 
+                        onClick={() => setIsExportComplianceOpen(true)}
+                      >
+                        <Globe className="w-4 h-4 mr-2" />
+                        Export Compliance
+                      </Button>
                     </>
                   ) : (
                     <>
@@ -467,6 +482,44 @@ const Dashboard = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Export Compliance Card - Only for Artists */}
+              {isArtist && (
+                <Card className="bg-gradient-to-br from-white to-blue-50/30 border-blue-100">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full"></div>
+                      Export Compliance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center p-2 rounded-lg bg-white/50">
+                        <span className="text-sm text-gray-600">Export Ready</span>
+                        <div className="text-right">
+                          <span className="font-semibold text-green-600">2</span>
+                          <div className="text-xs text-gray-500">artworks</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-2 rounded-lg bg-white/50">
+                        <span className="text-sm text-gray-600">In Review</span>
+                        <div className="text-right">
+                          <span className="font-semibold text-yellow-600">1</span>
+                          <div className="text-xs text-gray-500">application</div>
+                        </div>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                        onClick={() => setIsExportComplianceOpen(true)}
+                      >
+                        <Globe className="w-3 h-3 mr-1" />
+                        Manage Exports
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </TabsContent>
 
@@ -798,6 +851,24 @@ const Dashboard = () => {
       <SalesManagementModal 
         isOpen={isSalesManagementOpen} 
         onClose={() => setIsSalesManagementOpen(false)} 
+      />
+      <ExportComplianceModal 
+        isOpen={isExportComplianceOpen} 
+        onClose={() => setIsExportComplianceOpen(false)}
+        onOpenWizard={(type) => {
+          setExportWizardType(type);
+          setIsExportWizardOpen(true);
+        }}
+        onOpenTracker={() => setIsExportStatusOpen(true)}
+      />
+      <ExportComplianceWizard 
+        isOpen={isExportWizardOpen} 
+        onClose={() => setIsExportWizardOpen(false)}
+        complianceType={exportWizardType}
+      />
+      <ExportStatusTracker 
+        isOpen={isExportStatusOpen} 
+        onClose={() => setIsExportStatusOpen(false)} 
       />
     </main>
   );
