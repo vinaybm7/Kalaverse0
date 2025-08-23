@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
 import { toast } from "@/hooks/use-toast";
 import { ArtworkService } from "@/services/artworkService";
-import { ProfileService } from "@/services/profileService";
 import { Artwork, Profile } from "@/types/database";
 import { WishlistModal } from "@/components/dashboard/WishlistModal";
 import { ProfileSettingsModal } from "@/components/profile/ProfileSettingsModal";
@@ -36,6 +36,7 @@ type Artwork = Database['public']['Tables']['artworks']['Row'];
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { profile, isLoading: isProfileLoading, updateProfile } = useProfile();
   const [activeTab, setActiveTab] = useState("overview");
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,8 +51,8 @@ const Dashboard = () => {
   const [isExportStatusOpen, setIsExportStatusOpen] = useState(false);
   const [exportWizardType, setExportWizardType] = useState("");
 
-  // Get user type from metadata
-  const userType = user?.user_metadata?.user_type || "buyer";
+  // Get user type from profile or metadata
+  const userType = profile?.user_type || user?.user_metadata?.user_type || "buyer";
   const isArtist = userType === "artist";
 
   // Load artworks when component mounts or user changes
@@ -91,6 +92,11 @@ const Dashboard = () => {
     });
   };
 
+  // Handle profile update
+  const handleProfileUpdated = (updatedProfile: Profile) => {
+    updateProfile(updatedProfile);
+  };
+
   // Handle artwork deletion
   const handleDeleteArtwork = async (artworkId: string, artworkTitle: string) => {
     try {
@@ -120,17 +126,17 @@ const Dashboard = () => {
   const totalViews = artworks.reduce((sum, artwork) => sum + artwork.views, 0);
   const publishedArtworks = artworks.filter(artwork => artwork.status === 'published');
 
-  // Mock user data - in real app, fetch from API
+  // User data from profile or fallback to defaults
   const userData = {
     profile: {
-      name: user?.user_metadata?.full_name || (isArtist ? "Traditional Artist" : "Art Enthusiast"),
+      name: profile?.full_name || user?.user_metadata?.full_name || (isArtist ? "Traditional Artist" : "Art Enthusiast"),
       email: user?.email || "",
-      avatar: isArtist 
+      avatar: profile?.avatar_url || (isArtist 
         ? "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-        : "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-      userType: isArtist ? "Traditional Artist" : "Art Enthusiast",
-      joinedDate: "2024",
-      location: isArtist ? "Jaipur, Rajasthan" : "Mumbai, India"
+        : "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"),
+      userType: profile?.artist_name || (isArtist ? "Traditional Artist" : "Art Enthusiast"),
+      joinedDate: profile?.created_at ? new Date(profile.created_at).getFullYear().toString() : "2024",
+      location: profile?.location || (isArtist ? "Jaipur, Rajasthan" : "Mumbai, India")
     },
     stats: isArtist ? {
       artworks: artworks.length,
@@ -235,17 +241,43 @@ const Dashboard = () => {
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-cultural"></div>
           
           <div className="relative z-10 p-6 md:p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <div className="relative">
-                <img 
-                  src={userData.profile.avatar} 
-                  alt={userData.profile.name}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-gradient-cultural shadow-warm"
-                />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-cultural rounded-full flex items-center justify-center">
-                  <Star className="w-3 h-3 text-white" />
+            {isProfileLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-pulse flex items-center gap-6">
+                  <div className="w-20 h-20 md:w-24 md:h-24 bg-gray-200 rounded-full"></div>
+                  <div className="space-y-2">
+                    <div className="h-8 bg-gray-200 rounded w-48"></div>
+                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                    <div className="h-4 bg-gray-200 rounded w-24"></div>
+                  </div>
                 </div>
               </div>
+            ) : (
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div className="relative group">
+                  <img 
+                    src={userData.profile.avatar} 
+                    alt={userData.profile.name}
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-gradient-cultural shadow-warm object-cover"
+                    onError={(e) => {
+                      // Fallback to default avatar if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.src = isArtist 
+                        ? "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+                        : "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face";
+                    }}
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-cultural rounded-full flex items-center justify-center">
+                    <Star className="w-3 h-3 text-white" />
+                  </div>
+                  {/* Edit overlay on hover */}
+                  <div 
+                    className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={() => setIsProfileEditOpen(true)}
+                  >
+                    <Edit className="w-5 h-5 text-white" />
+                  </div>
+                </div>
               
               <div className="flex-1">
                 <div className="mb-3">
@@ -322,6 +354,7 @@ const Dashboard = () => {
                 Edit Profile
               </Button>
             </div>
+            )}
           </div>
         </div>
 
@@ -922,7 +955,8 @@ const Dashboard = () => {
       />
       <ProfileSettingsModal 
         isOpen={isProfileEditOpen} 
-        onClose={() => setIsProfileEditOpen(false)} 
+        onClose={() => setIsProfileEditOpen(false)}
+        onProfileUpdated={handleProfileUpdated}
       />
       <UploadArtworkModal 
         isOpen={isUploadArtworkOpen} 

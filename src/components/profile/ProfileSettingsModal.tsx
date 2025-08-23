@@ -38,6 +38,7 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -138,10 +139,11 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
     const file = event.target.files?.[0];
     if (file) {
       // Validate file type and size
-      if (!file.type.startsWith('image/')) {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
         toast({
           title: "Invalid File Type",
-          description: "Please select a valid image file.",
+          description: "Please select a JPG, PNG, or WebP image file.",
           variant: "destructive"
         });
         return;
@@ -164,6 +166,11 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
         setAvatarPreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+
+      toast({
+        title: "Image Selected",
+        description: "Your new profile picture will be uploaded when you save changes."
+      });
     }
   };
 
@@ -177,7 +184,25 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
 
       // Upload new avatar if selected
       if (avatarFile) {
-        avatarUrl = await ProfileService.uploadAvatar(avatarFile, user.id);
+        setIsUploadingAvatar(true);
+        try {
+          avatarUrl = await ProfileService.uploadAvatar(avatarFile, user.id);
+          toast({
+            title: "Avatar Uploaded",
+            description: "Your profile picture has been updated successfully!"
+          });
+        } catch (error) {
+          console.error('Avatar upload error:', error);
+          toast({
+            title: "Avatar Upload Failed",
+            description: "Failed to upload your profile picture. Continuing with other changes.",
+            variant: "destructive"
+          });
+          // Continue with profile update even if avatar upload fails
+          avatarUrl = profile.avatar_url;
+        } finally {
+          setIsUploadingAvatar(false);
+        }
       }
 
       // Prepare update data
@@ -206,14 +231,15 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
 
       if (updatedProfile) {
         setProfile(updatedProfile);
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been updated successfully!"
-        });
 
         if (onProfileUpdated) {
           onProfileUpdated(updatedProfile);
         }
+
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been updated successfully!"
+        });
 
         onClose();
       }
@@ -275,18 +301,25 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
                 <CardContent className="space-y-4">
                   {/* Avatar Upload */}
                   <div className="flex items-center gap-4">
-                    <Avatar className="w-20 h-20">
-                      <AvatarImage src={avatarPreview || undefined} />
-                      <AvatarFallback>
-                        {formData.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
+                    <div className="relative group">
+                      <Avatar className="w-20 h-20">
+                        <AvatarImage src={avatarPreview || undefined} />
+                        <AvatarFallback>
+                          {formData.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Hover overlay for avatar */}
+                      <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <Camera className="w-5 h-5 text-white" />
+                      </div>
+                      <Label htmlFor="avatar-upload" className="absolute inset-0 cursor-pointer" />
+                    </div>
+                    <div className="flex-1">
                       <Label htmlFor="avatar-upload" className="cursor-pointer">
                         <Button variant="outline" size="sm" asChild>
                           <span>
                             <Camera className="w-4 h-4 mr-2" />
-                            Change Avatar
+                            {avatarPreview ? 'Change Avatar' : 'Upload Avatar'}
                           </span>
                         </Button>
                       </Label>
@@ -298,8 +331,29 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
                         onChange={handleAvatarUpload}
                       />
                       <p className="text-sm text-muted-foreground mt-1">
-                        Max 5MB. JPG, PNG supported.
+                        Max 5MB. JPG, PNG, WebP supported.
                       </p>
+                      {avatarFile && (
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-sm text-green-600">
+                            ✓ New image selected: {avatarFile.name}
+                          </p>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setAvatarFile(null);
+                              setAvatarPreview(profile?.avatar_url || null);
+                              // Reset the file input
+                              const input = document.getElementById('avatar-upload') as HTMLInputElement;
+                              if (input) input.value = '';
+                            }}
+                            className="text-red-600 hover:text-red-700 h-auto p-1"
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -550,13 +604,18 @@ export const ProfileSettingsModal = ({ isOpen, onClose, onProfileUpdated }: Prof
             <X className="w-4 h-4 mr-2" />
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
-            {isSaving ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          <Button onClick={handleSave} disabled={isSaving || isUploadingAvatar}>
+            {isSaving || isUploadingAvatar ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                {isUploadingAvatar ? 'Uploading Avatar...' : 'Saving Changes...'}
+              </>
             ) : (
-              <Save className="w-4 h-4 mr-2" />
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </>
             )}
-            Save Changes
           </Button>
         </div>
       </DialogContent>
