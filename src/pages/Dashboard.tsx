@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { ArtworkService } from "@/services/artworkService";
-import { Database } from "@/lib/database.types";
+import { ProfileService } from "@/services/profileService";
+import { Artwork, Profile } from "@/types/database";
 import { WishlistModal } from "@/components/dashboard/WishlistModal";
-import { ProfileEditModal } from "@/components/dashboard/ProfileEditModal";
+import { ProfileSettingsModal } from "@/components/profile/ProfileSettingsModal";
 import { UploadArtworkModal } from "@/components/dashboard/UploadArtworkModal";
 import { SalesManagementModal } from "@/components/dashboard/SalesManagementModal";
 import { ExportComplianceModal } from "@/components/export/ExportComplianceModal";
@@ -67,7 +68,7 @@ const Dashboard = () => {
     
     try {
       setIsLoading(true);
-      const userArtworks = await ArtworkService.getArtworksByArtist(user.id);
+      const userArtworks = await ArtworkService.getArtistArtworks(user.id, true);
       setArtworks(userArtworks);
     } catch (error) {
       console.error('Error loading artworks:', error);
@@ -919,7 +920,7 @@ const Dashboard = () => {
         isOpen={isWishlistOpen} 
         onClose={() => setIsWishlistOpen(false)} 
       />
-      <ProfileEditModal 
+      <ProfileSettingsModal 
         isOpen={isProfileEditOpen} 
         onClose={() => setIsProfileEditOpen(false)} 
       />
