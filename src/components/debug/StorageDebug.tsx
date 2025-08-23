@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { StorageTest } from '@/utils/storageTest'
+import { SystemCheck, SystemCheckResult } from '@/utils/systemCheck'
 import { ArtworkService } from '@/services/artworkService'
 import { ProfileService } from '@/services/profileService'
 import { useAuth } from '@/contexts/AuthContext'
@@ -22,6 +23,7 @@ import {
 export const StorageDebug = () => {
   const { user } = useAuth()
   const [isTestingStorage, setIsTestingStorage] = useState(false)
+  const [isRunningSystemCheck, setIsRunningSystemCheck] = useState(false)
   const [isUploadingArtwork, setIsUploadingArtwork] = useState(false)
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const [testResults, setTestResults] = useState<{
@@ -33,6 +35,8 @@ export const StorageDebug = () => {
     buckets: null,
     upload: null
   })
+  const [systemCheckResults, setSystemCheckResults] = useState<SystemCheckResult[]>([])
+  const [showSystemCheck, setShowSystemCheck] = useState(false)
 
   const runStorageTests = async () => {
     setIsTestingStorage(true)
@@ -66,6 +70,34 @@ export const StorageDebug = () => {
       })
     } finally {
       setIsTestingStorage(false)
+    }
+  }
+
+  const runSystemCheck = async () => {
+    setIsRunningSystemCheck(true)
+    setSystemCheckResults([])
+
+    try {
+      const results = await SystemCheck.runAllChecks()
+      setSystemCheckResults(results)
+      setShowSystemCheck(true)
+
+      const summary = SystemCheck.printResults(results)
+      
+      toast({
+        title: "System Check Complete",
+        description: `${summary.passed} passed, ${summary.failed} failed, ${summary.warnings} warnings`,
+        variant: summary.failed > 0 ? "destructive" : "default"
+      })
+    } catch (error) {
+      console.error('System check failed:', error)
+      toast({
+        title: "System Check Failed",
+        description: "Check the console for error details",
+        variant: "destructive"
+      })
+    } finally {
+      setIsRunningSystemCheck(false)
     }
   }
 
@@ -164,18 +196,33 @@ export const StorageDebug = () => {
             </Badge>
           </div>
 
-          <Button 
-            onClick={runStorageTests} 
-            disabled={isTestingStorage}
-            className="w-full"
-          >
-            {isTestingStorage ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <TestTube className="w-4 h-4 mr-2" />
-            )}
-            Run Storage Tests
-          </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Button 
+              onClick={runStorageTests} 
+              disabled={isTestingStorage}
+              variant="outline"
+            >
+              {isTestingStorage ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <TestTube className="w-4 h-4 mr-2" />
+              )}
+              Quick Storage Test
+            </Button>
+
+            <Button 
+              onClick={runSystemCheck} 
+              disabled={isRunningSystemCheck}
+              className="bg-gradient-cultural hover:shadow-warm"
+            >
+              {isRunningSystemCheck ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <TestTube className="w-4 h-4 mr-2" />
+              )}
+              Full System Check
+            </Button>
+          </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -249,9 +296,87 @@ export const StorageDebug = () => {
         </Card>
       )}
 
+      {showSystemCheck && systemCheckResults.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>System Check Results</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowSystemCheck(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {systemCheckResults.map((result, index) => (
+                <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {result.status === 'pass' ? (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    ) : result.status === 'fail' ? (
+                      <XCircle className="w-4 h-4 text-red-500" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full bg-yellow-500" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-sm">{result.component}</h4>
+                      {getStatusBadge(
+                        result.status === 'pass' ? true : 
+                        result.status === 'fail' ? false : null
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">{result.message}</p>
+                    {result.details && (
+                      <details className="mt-2">
+                        <summary className="text-xs text-gray-500 cursor-pointer">Details</summary>
+                        <pre className="text-xs bg-gray-100 p-2 rounded mt-1 overflow-x-auto">
+                          {typeof result.details === 'string' 
+                            ? result.details 
+                            : JSON.stringify(result.details, null, 2)
+                          }
+                        </pre>
+                      </details>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4 pt-4 border-t">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-bold text-green-600">
+                    {systemCheckResults.filter(r => r.status === 'pass').length}
+                  </div>
+                  <div className="text-sm text-gray-600">Passed</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-red-600">
+                    {systemCheckResults.filter(r => r.status === 'fail').length}
+                  </div>
+                  <div className="text-sm text-gray-600">Failed</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-yellow-600">
+                    {systemCheckResults.filter(r => r.status === 'warning').length}
+                  </div>
+                  <div className="text-sm text-gray-600">Warnings</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
-          <CardTitle>Storage Configuration Check</CardTitle>
+          <CardTitle>Configuration Status</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm">

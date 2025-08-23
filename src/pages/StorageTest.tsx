@@ -1,8 +1,10 @@
 import { Navigation } from "@/components/Navigation"
 import { Footer } from "@/components/Footer"
 import { StorageDebug } from "@/components/debug/StorageDebug"
+import { VerificationChecklist } from "@/components/debug/VerificationChecklist"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { InfoIcon } from "lucide-react"
 
 const StorageTest = () => {

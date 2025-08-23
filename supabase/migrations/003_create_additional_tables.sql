@@ -192,7 +192,7 @@ CREATE TRIGGER update_reviews_updated_at
 
 -- Function to toggle favorite
 CREATE OR REPLACE FUNCTION toggle_favorite(artwork_id UUID)
-RETURNS BOOLEAN AS $
+RETURNS BOOLEAN AS $$
 DECLARE
     is_favorited BOOLEAN;
 BEGIN
@@ -214,7 +214,7 @@ BEGIN
         RETURN true;
     END IF;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to get artist statistics
 CREATE OR REPLACE FUNCTION get_artist_statistics(artist_id UUID)
@@ -226,7 +226,7 @@ RETURNS TABLE (
     total_revenue DECIMAL,
     average_rating DECIMAL,
     total_reviews BIGINT
-) AS $
+) AS $$
 BEGIN
     RETURN QUERY
     SELECT 
@@ -238,4 +238,4 @@ BEGIN
         (SELECT COALESCE(AVG(rating::DECIMAL), 0) FROM public.reviews WHERE artist_id = get_artist_statistics.artist_id AND is_public = true) as average_rating,
         (SELECT COUNT(*) FROM public.reviews WHERE artist_id = get_artist_statistics.artist_id AND is_public = true) as total_reviews;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

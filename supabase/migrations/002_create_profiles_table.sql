@@ -89,7 +89,7 @@ CREATE TRIGGER update_profiles_updated_at
 
 -- Function to create profile on user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $
+RETURNS trigger AS $$
 BEGIN
     INSERT INTO public.profiles (id, email, full_name, user_type)
     VALUES (
@@ -100,7 +100,7 @@ BEGIN
     );
     RETURN NEW;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger to automatically create profile on user signup
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -129,7 +129,7 @@ RETURNS TABLE (
     artwork_count BIGINT,
     total_likes BIGINT,
     total_views BIGINT
-) AS $
+) AS $$
 BEGIN
     RETURN QUERY
     SELECT 
@@ -158,4 +158,4 @@ BEGIN
              p.artist_name, p.specialization, p.experience_years, p.location, 
              p.phone, p.website_url, p.social_links, p.is_verified, p.created_at;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
