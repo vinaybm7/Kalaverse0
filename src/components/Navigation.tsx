@@ -98,12 +98,12 @@ export const Navigation = () => {
               >
                 Artists
               </button>
-              <button 
-                onClick={() => handleNavigation('about')} 
-                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+              <Link 
+                to="/about" 
+                className="text-foreground hover:text-primary transition-colors"
               >
                 About
-              </button>
+              </Link>
             </div>
             
             {/* Search and Actions */}

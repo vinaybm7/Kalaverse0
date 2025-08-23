@@ -6,7 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Index from "./pages/Index";
-import ArtistProfile from "./pages/ArtistProfile";
+import { ArtistProfile } from "./pages/ArtistProfile";
+import { About } from "./pages/About";
 import ArtworkDetail from "./pages/ArtworkDetail";
 import Dashboard from "./pages/Dashboard";
 import StorageTest from "./pages/StorageTest";
@@ -24,6 +25,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
               <Route path="/artist/:artistId" element={<ArtistProfile />} />
               <Route path="/artwork/:artworkId" element={<ArtworkDetail />} />
               <Route path="/dashboard" element={<Dashboard />} />

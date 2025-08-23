@@ -1,173 +1,266 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Star, Heart, Share2 } from "lucide-react";
+import { MapPin, Star, Award, Calendar, Heart, ShoppingCart, Eye } from "lucide-react";
+import { getArtistById, getArtworksByArtist } from "@/data/artworks";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 
-const ArtistProfile = () => {
-  const { artistId } = useParams();
+export const ArtistProfile = () => {
+  const { artistId } = useParams<{ artistId: string }>();
+  const [likedArtworks, setLikedArtworks] = useState<number[]>([]);
+  const { addToCart } = useCart();
+  
+  const artist = artistId ? getArtistById(artistId) : null;
+  const artistArtworks = artist ? getArtworksByArtist(artist.name) : [];
 
-  // Mock artist data - in real app, fetch from API
-  const artist = {
-    id: artistId,
-    name: "Priya Sharma",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-    coverImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=400&fit=crop",
-    location: "Jaipur, Rajasthan",
-    joinedDate: "2023",
-    bio: "Traditional Rajasthani miniature painter with 15+ years of experience. Specializing in Mughal and Pahari painting styles, bringing ancient techniques to contemporary themes.",
-    specialties: ["Miniature Painting", "Mughal Art", "Traditional Portraits"],
-    stats: {
-      artworks: 47,
-      followers: 1234,
-      likes: 5678
-    },
-    artworks: [
-      {
-        id: 1,
-        title: "Royal Procession",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop",
-        price: "₹15,000",
-        likes: 89
-      },
-      {
-        id: 2,
-        title: "Peacock Dance",
-        image: "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=300&h=300&fit=crop",
-        price: "₹12,000",
-        likes: 67
-      },
-      {
-        id: 3,
-        title: "Garden of Paradise",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop",
-        price: "₹18,000",
-        likes: 123
-      }
-    ]
+  if (!artist) {
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold mb-4">Artist Not Found</h1>
+          <p className="text-muted-foreground mb-6">The artist you're looking for doesn't exist.</p>
+          <Link to="/">
+            <Button variant="cultural">Back to Home</Button>
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const handleLike = (artworkId: number) => {
+    setLikedArtworks(prev => {
+      const isLiked = prev.includes(artworkId);
+      const artwork = artistArtworks.find(art => art.id === artworkId);
+      
+      toast({
+        title: isLiked ? "Removed from Favorites" : "Added to Favorites",
+        description: isLiked 
+          ? `${artwork?.title} removed from your favorites.`
+          : `${artwork?.title} added to your favorites!`
+      });
+      
+      return isLiked 
+        ? prev.filter(id => id !== artworkId)
+        : [...prev, artworkId];
+    });
+  };
+
+  const handleAddToCart = (artwork: typeof artistArtworks[0]) => {
+    addToCart({
+      id: artwork.id,
+      title: artwork.title,
+      artist: artwork.artist,
+      category: artwork.category,
+      price: artwork.price,
+      image: artwork.image
+    });
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+    <div className="min-h-screen">
       <Navigation />
       
-      {/* Cover Image */}
-      <div className="relative h-64 md:h-80 overflow-hidden">
-        <img 
-          src={artist.coverImage} 
-          alt="Artist cover" 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
-        {/* Artist Info Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <img 
-              src={artist.avatar} 
-              alt={artist.name}
-              className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg"
-            />
+      {/* Artist Header */}
+      <section className="pt-20 pb-12 bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* Artist Image & Basic Info */}
+            <div className="lg:col-span-1">
+              <Card className="overflow-hidden">
+                <div className="p-6">
+                  <div className="text-center mb-6">
+                    <img 
+                      src={artist.avatar} 
+                      alt={artist.name}
+                      className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-primary/20"
+                    />
+                    <h1 className="text-2xl font-bold mb-2">{artist.name}</h1>
+                    <div className="flex items-center justify-center text-muted-foreground mb-2">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {artist.location}
+                    </div>
+                    <Badge variant="secondary" className="mb-4">
+                      {artist.specialty}
+                    </Badge>
+                    <div className="flex items-center justify-center">
+                      <Star className="w-5 h-5 text-accent fill-current mr-1" />
+                      <span className="text-lg font-semibold">{artist.rating}</span>
+                      <span className="text-muted-foreground ml-1">rating</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center">
+                        <Award className="w-4 h-4 mr-2 text-primary" />
+                        <span className="text-sm">Experience</span>
+                      </div>
+                      <span className="font-semibold">{artist.experience}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 text-primary" />
+                        <span className="text-sm">Artworks</span>
+                      </div>
+                      <span className="font-semibold">{artistArtworks.length} available</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
             
-            <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                {artist.name}
-              </h1>
+            {/* Artist Bio & Achievements */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">About the Artist</h2>
+                  <p className="text-muted-foreground leading-relaxed mb-6">
+                    {artist.bio}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {artist.description}
+                  </p>
+                </CardContent>
+              </Card>
               
-              <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-4">
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  <span>{artist.location}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>Joined {artist.joinedDate}</span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                {artist.specialties.map((specialty) => (
-                  <Badge key={specialty} variant="secondary" className="bg-orange-100 text-orange-800">
-                    {specialty}
-                  </Badge>
-                ))}
-              </div>
-
-              <p className="text-gray-700 mb-6 max-w-2xl">
-                {artist.bio}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-6 mb-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{artist.stats.artworks}</div>
-                  <div className="text-sm text-gray-600">Artworks</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{artist.stats.followers}</div>
-                  <div className="text-sm text-gray-600">Followers</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{artist.stats.likes}</div>
-                  <div className="text-sm text-gray-600">Total Likes</div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-                  Follow Artist
-                </Button>
-                <Button variant="outline" className="border-orange-200 hover:bg-orange-50">
-                  <Heart className="w-4 h-4 mr-2" />
-                  Save
-                </Button>
-                <Button variant="outline" className="border-orange-200 hover:bg-orange-50">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">Achievements & Recognition</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {artist.achievements.map((achievement, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
+                        <Award className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{achievement}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
-
-        {/* Artworks Grid */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Artworks</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {artist.artworks.map((artwork) => (
-              <div key={artwork.id} className="group cursor-pointer">
-                <div className="relative overflow-hidden rounded-xl mb-3">
-                  <img 
-                    src={artwork.image} 
-                    alt={artwork.title}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Heart className="w-4 h-4 text-red-500" />
-                  </div>
-                </div>
-                
-                <h3 className="font-semibold text-gray-900 mb-1">{artwork.title}</h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-orange-600">{artwork.price}</span>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <Star className="w-4 h-4 fill-current text-yellow-400" />
-                    <span className="text-sm">{artwork.likes}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+      </section>
+      
+      {/* Artist's Artworks */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Artworks by {artist.name}</h2>
+            <p className="text-lg text-muted-foreground">
+              Explore the beautiful collection of {artist.specialty.toLowerCase()} by this talented artist
+            </p>
           </div>
-        </div>
-      </div>
+          
+          {artistArtworks.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">No artworks available at the moment.</p>
+              <Link to="/#gallery">
+                <Button variant="cultural">Browse All Artworks</Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {artistArtworks.map((artwork) => (
+                <Card key={artwork.id} className="group hover:shadow-warm transition-all duration-300 overflow-hidden">
+                  <Link to={`/artwork/${artwork.id}`}>
+                    <div className="relative cursor-pointer">
+                      <img 
+                        src={artwork.image}
+                        alt={artwork.title}
+                        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 left-3">
+                        <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+                          {artwork.category}
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="ghost" 
+                        size="icon"
+                        className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm hover:bg-background/90 z-10"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleLike(artwork.id);
+                        }}
+                      >
+                        <Heart 
+                          className={`w-4 h-4 transition-colors ${
+                            likedArtworks.includes(artwork.id) 
+                              ? 'fill-red-500 text-red-500' 
+                              : 'text-muted-foreground'
+                          }`} 
+                        />
+                      </Button>
+                    </div>
+                  </Link>
 
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">{artwork.title}</h3>
+                        <p className="text-sm text-muted-foreground">{artwork.description}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="flex items-center space-x-4">
+                          <span className="flex items-center">
+                            <Heart className="w-3 h-3 mr-1" />
+                            {artwork.likes}
+                          </span>
+                          <span className="flex items-center">
+                            <Eye className="w-3 h-3 mr-1" />
+                            {artwork.views}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {artwork.location}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">by {artwork.artist}</p>
+                          <p className="text-lg font-bold text-primary">₹{artwork.price.toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="cultural" 
+                          className="flex-1"
+                          onClick={() => handleAddToCart(artwork)}
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Add to Cart
+                        </Button>
+                        <Link to={`/artwork/${artwork.id}`}>
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      
       <Footer />
-    </main>
+    </div>
   );
 };
-
-export default ArtistProfile;

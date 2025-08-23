@@ -2,39 +2,7 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Star } from "lucide-react";
-
-const artists = [
-  {
-    id: "rajesh-baiga",
-    name: "Rajesh Baiga",
-    location: "Maharashtra",
-    specialty: "Warli Art",
-    rating: 4.9,
-    artworks: 32,
-    description: "Master of traditional Warli art with 25+ years of experience",
-    avatar: "/artist-1.png"
-  },
-  {
-    id: "sunita-devi",
-    name: "Sunita Devi",
-    location: "Gujarat", 
-    specialty: "Pithora Art",
-    rating: 4.9,
-    artworks: 45,
-    description: "Traditional Pithora artist creating vibrant cultural narratives",
-    avatar: "/artist-3.png"
-  },
-  {
-    id: "kishore-rathwa",
-    name: "Kishore Rathwa",
-    location: "Bihar",
-    specialty: "Madhubani Art", 
-    rating: 4.8,
-    artworks: 28,
-    description: "Award-winning Madhubani artist preserving ancient techniques",
-    avatar: "/artist-2.png"
-  }
-];
+import { artists } from "@/data/artworks";
 
 export const FeaturedArtists = () => {
   return (
@@ -51,7 +19,7 @@ export const FeaturedArtists = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {artists.map((artist, index) => (
+          {artists.slice(0, 3).map((artist, index) => (
             <Card key={index} className="group hover:shadow-elegant transition-all duration-300">
               <div className="p-6">
                 <div className="flex items-center space-x-4 mb-4">
