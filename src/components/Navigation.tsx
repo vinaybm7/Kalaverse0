@@ -78,17 +78,18 @@ export const Navigation = () => {
         <div className="absolute bottom-2 right-4 text-primary/20 text-xs">✦</div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo with Traditional Elements */}
+            {/* Logo with Traditional Elements - Complete White Box */}
             <div className="flex items-center">
               <Link to="/" className="flex items-center gap-3 group">
-                {/* Traditional Symbol */}
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-cultural shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-white font-bold text-lg">॰</span>
-                </div>
-                
-                {/* Logo and Brand with Enhanced White Background */}
-                <div className="flex items-center gap-2">
-                  <div className="flex flex-col bg-white/95 backdrop-blur-md rounded-lg px-4 py-2 shadow-lg border border-white/50 group-hover:shadow-xl transition-all duration-300">
+                {/* Complete Logo Container with White Background */}
+                <div className="flex items-center gap-3 bg-white/95 backdrop-blur-md rounded-xl px-4 py-2 shadow-lg border border-white/50 group-hover:shadow-xl transition-all duration-300">
+                  {/* Traditional Symbol */}
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-cultural shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-white font-bold text-lg">॰</span>
+                  </div>
+                  
+                  {/* Logo and Brand Text */}
+                  <div className="flex flex-col">
                     <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent hover:opacity-80 transition-opacity leading-tight">
                       KalaVerse
                     </h2>
