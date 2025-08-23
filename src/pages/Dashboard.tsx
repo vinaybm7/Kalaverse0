@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 import { 
   User, 
   Heart, 
@@ -16,7 +17,8 @@ import {
   Eye,
   Edit,
   Trash2,
-  Plus
+  Plus,
+  MapPin
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -238,65 +240,114 @@ const Dashboard = () => {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card>
+              <Card className="bg-gradient-to-br from-white to-orange-50/30 border-orange-100">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Recent Activity</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <div className="w-2 h-2 bg-gradient-cultural rounded-full"></div>
+                    Recent Activity
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
                       <Heart className="w-4 h-4 text-red-500" />
                       <span className="text-sm">Someone liked your "Sunset Mandala"</span>
+                      <span className="text-xs text-gray-500 ml-auto">2h ago</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
                       <Star className="w-4 h-4 text-yellow-500" />
                       <span className="text-sm">New follower: Raj Kumar</span>
+                      <span className="text-xs text-gray-500 ml-auto">5h ago</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
                       <Eye className="w-4 h-4 text-blue-500" />
                       <span className="text-sm">Your art was viewed 50 times today</span>
+                      <span className="text-xs text-gray-500 ml-auto">1d ago</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gradient-to-br from-white to-red-50/30 border-red-100">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <div className="w-2 h-2 bg-gradient-terracotta rounded-full"></div>
+                    Quick Actions
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button 
+                    className="w-full justify-start bg-gradient-cultural hover:shadow-warm text-white" 
+                    onClick={() => {
+                      toast({
+                        title: "Upload Artwork",
+                        description: "Upload feature coming soon! Share your traditional art with the world."
+                      })
+                    }}
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     Upload New Artwork
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => {
+                      toast({
+                        title: "Edit Profile",
+                        description: "Profile editing feature coming soon!"
+                      })
+                    }}
+                  >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit Profile
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => {
+                      toast({
+                        title: "Account Settings",
+                        description: "Settings panel coming soon!"
+                      })
+                    }}
+                  >
                     <Settings className="w-4 h-4 mr-2" />
                     Account Settings
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gradient-to-br from-white to-yellow-50/30 border-yellow-100">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Performance</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"></div>
+                    Performance
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-2 rounded-lg bg-white/50">
                       <span className="text-sm text-gray-600">Profile Views</span>
-                      <span className="font-semibold">234 this week</span>
+                      <div className="text-right">
+                        <span className="font-semibold text-blue-600">234</span>
+                        <div className="text-xs text-gray-500">this week</div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center p-2 rounded-lg bg-white/50">
                       <span className="text-sm text-gray-600">Art Engagement</span>
-                      <span className="font-semibold">89% positive</span>
+                      <div className="text-right">
+                        <span className="font-semibold text-green-600">89%</span>
+                        <div className="text-xs text-gray-500">positive</div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Sales</span>
-                      <span className="font-semibold">₹25,000 this month</span>
+                    <div className="flex justify-between items-center p-2 rounded-lg bg-white/50">
+                      <span className="text-sm text-gray-600">
+                        {userData.profile.userType === 'artist' ? 'Sales' : 'Purchases'}
+                      </span>
+                      <div className="text-right">
+                        <span className="font-semibold text-orange-600">₹25,000</span>
+                        <div className="text-xs text-gray-500">this month</div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -306,53 +357,87 @@ const Dashboard = () => {
 
           <TabsContent value="artworks" className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">My Artworks</h2>
-              <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+              <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent">
+                {userData.profile.userType === 'artist' ? 'My Artworks' : 'My Collection'}
+              </h2>
+              <Button 
+                className="bg-gradient-cultural hover:shadow-warm transition-all duration-300"
+                onClick={() => {
+                  toast({
+                    title: userData.profile.userType === 'artist' ? "Upload Artwork" : "Browse Gallery",
+                    description: userData.profile.userType === 'artist' 
+                      ? "Upload feature coming soon! Share your traditional art with the world."
+                      : "Discover beautiful traditional artworks in our gallery."
+                  })
+                }}
+              >
                 <Plus className="w-4 h-4 mr-2" />
-                Upload New Art
+                {userData.profile.userType === 'artist' ? 'Upload New Art' : 'Add to Collection'}
               </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userData.myArtworks.map((artwork) => (
-                <Card key={artwork.id} className="overflow-hidden">
+                <Card key={artwork.id} className="overflow-hidden hover:shadow-warm transition-all duration-300 group">
                   <div className="relative">
                     <img 
                       src={artwork.image} 
                       alt={artwork.title}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <Badge 
                       className={`absolute top-3 right-3 ${
                         artwork.status === 'Published' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
+                          ? 'bg-green-100 text-green-800 border-green-200' 
+                          : 'bg-yellow-100 text-yellow-800 border-yellow-200'
                       }`}
                     >
                       {artwork.status}
                     </Badge>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 bg-gradient-to-br from-white to-orange-50/30">
                     <h3 className="font-semibold text-gray-900 mb-2">{artwork.title}</h3>
                     <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1">
-                          <Heart className="w-3 h-3" />
+                        <span className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
+                          <Heart className="w-3 h-3 text-red-500" />
                           {artwork.likes}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
+                        <span className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
+                          <Eye className="w-3 h-3 text-blue-500" />
                           {artwork.views}
                         </span>
                       </div>
-                      <span className="font-semibold text-orange-600">{artwork.price}</span>
+                      <span className="font-semibold text-orange-600 bg-white/50 px-2 py-1 rounded-full">{artwork.price}</span>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="flex-1">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex-1 border-orange-200 hover:bg-orange-50"
+                        onClick={() => {
+                          toast({
+                            title: "Edit Artwork",
+                            description: `Editing ${artwork.title}...`
+                          })
+                        }}
+                      >
                         <Edit className="w-3 h-3 mr-1" />
                         Edit
                       </Button>
-                      <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                        onClick={() => {
+                          toast({
+                            title: "Delete Artwork",
+                            description: `Are you sure you want to delete ${artwork.title}?`,
+                            variant: "destructive"
+                          })
+                        }}
+                      >
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
@@ -363,24 +448,73 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="favorites" className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Favorite Artworks</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent">
+                Favorite Artworks ❤️
+              </h2>
+              <Button 
+                variant="outline" 
+                className="border-orange-200 hover:bg-orange-50"
+                onClick={() => {
+                  toast({
+                    title: "Browse Gallery",
+                    description: "Discover more beautiful traditional artworks!"
+                  })
+                }}
+              >
+                Discover More Art
+              </Button>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userData.favorites.map((artwork) => (
-                <Card key={artwork.id} className="overflow-hidden">
-                  <img 
-                    src={artwork.image} 
-                    alt={artwork.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <CardContent className="p-4">
+                <Card key={artwork.id} className="overflow-hidden hover:shadow-warm transition-all duration-300 group">
+                  <div className="relative">
+                    <img 
+                      src={artwork.image} 
+                      alt={artwork.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Heart className="w-4 h-4 text-red-500 fill-current" />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                  <CardContent className="p-4 bg-gradient-to-br from-white to-red-50/30">
                     <h3 className="font-semibold text-gray-900 mb-1">{artwork.title}</h3>
-                    <p className="text-sm text-gray-600 mb-2">by {artwork.artist}</p>
+                    <p className="text-sm text-gray-600 mb-3 flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      by {artwork.artist}
+                    </p>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-orange-600">{artwork.price}</span>
-                      <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-                        View
-                      </Button>
+                      <span className="font-semibold text-orange-600 bg-white/50 px-2 py-1 rounded-full">{artwork.price}</span>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-cultural hover:shadow-warm transition-all duration-300"
+                          onClick={() => {
+                            toast({
+                              title: "View Artwork",
+                              description: `Opening ${artwork.title} by ${artwork.artist}`
+                            })
+                          }}
+                        >
+                          View
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="border-orange-200 hover:bg-orange-50"
+                          onClick={() => {
+                            toast({
+                              title: "Add to Cart",
+                              description: `${artwork.title} added to your cart!`
+                            })
+                          }}
+                        >
+                          <ShoppingCart className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -389,40 +523,90 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="orders" className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Order History</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent">
+                Order History 🛒
+              </h2>
+              <Button 
+                variant="outline" 
+                className="border-orange-200 hover:bg-orange-50"
+                onClick={() => {
+                  toast({
+                    title: "Browse Gallery",
+                    description: "Discover more artworks to add to your collection!"
+                  })
+                }}
+              >
+                Shop More Art
+              </Button>
+            </div>
             
             <div className="space-y-4">
               {userData.orders.map((order) => (
-                <Card key={order.id}>
+                <Card key={order.id} className="hover:shadow-warm transition-all duration-300 bg-gradient-to-br from-white to-blue-50/30 border-blue-100">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">
-                          Order #{order.id}
-                        </h3>
-                        <p className="text-gray-600 mb-1">
-                          {order.artwork} by {order.artist}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <ShoppingCart className="w-4 h-4 text-blue-500" />
+                          <h3 className="font-semibold text-gray-900">
+                            Order #{order.id}
+                          </h3>
+                        </div>
+                        <p className="text-gray-600 mb-1 font-medium">
+                          {order.artwork}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 flex items-center gap-1">
+                          <User className="w-3 h-3" />
+                          by {order.artist}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
                           Ordered on {order.date}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <div className="font-semibold text-gray-900">{order.amount}</div>
+                          <div className="font-bold text-orange-600 text-lg">{order.amount}</div>
                           <Badge 
-                            className={
+                            className={`${
                               order.status === 'Delivered' 
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-blue-100 text-blue-800'
-                            }
+                                ? 'bg-green-100 text-green-800 border-green-200' 
+                                : 'bg-blue-100 text-blue-800 border-blue-200'
+                            } shadow-sm`}
                           >
                             {order.status}
                           </Badge>
                         </div>
-                        <Button variant="outline" size="sm">
-                          View Details
-                        </Button>
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="border-orange-200 hover:bg-orange-50"
+                            onClick={() => {
+                              toast({
+                                title: "Order Details",
+                                description: `Viewing details for order #${order.id}`
+                              })
+                            }}
+                          >
+                            View Details
+                          </Button>
+                          {order.status === 'Delivered' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="border-green-200 hover:bg-green-50 text-green-700"
+                              onClick={() => {
+                                toast({
+                                  title: "Rate Artwork",
+                                  description: "Share your experience with this artwork!"
+                                })
+                              }}
+                            >
+                              Rate & Review
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </CardContent>

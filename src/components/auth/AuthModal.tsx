@@ -25,7 +25,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg border-0 bg-transparent shadow-none p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] border-0 bg-transparent shadow-none p-0 overflow-y-auto">
         <div className="relative">
           {/* Cultural background pattern */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 rounded-2xl"></div>
