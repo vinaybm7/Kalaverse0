@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
-import { Upload, Image, Palette, Tag, DollarSign } from "lucide-react";
+import { Upload, Image, Palette, Tag, DollarSign, CheckCircle, Loader2 } from "lucide-react";
 
 interface UploadArtworkModalProps {
   isOpen: boolean;
@@ -23,27 +24,91 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
     dimensions: "",
     price: "",
     tags: "",
-    status: "draft"
+    status: "draft",
+    imageFile: null as File | null
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        processImageFile(file);
+      } else {
+        toast({
+          title: "Invalid File Type",
+          description: "Please drop a valid image file (JPG, PNG, GIF).",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const processImageFile = (file: File) => {
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image smaller than 10MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImagePreview(e.target?.result as string);
+      handleInputChange('imageFile', file);
+    };
+    reader.readAsDataURL(file);
+    
+    toast({
+      title: "Image Uploaded",
+      description: `${file.name} has been uploaded successfully.`
+    });
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid File Type",
+          description: "Please select a valid image file (JPG, PNG, GIF).",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      processImageFile(file);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // Validate required fields
     if (!formData.title || !formData.description || !formData.price) {
       toast({
         title: "Missing Information",
@@ -53,11 +118,77 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
       return;
     }
 
-    toast({
-      title: "Artwork Uploaded",
-      description: `${formData.title} has been ${formData.status === 'published' ? 'published' : 'saved as draft'}!`
-    });
-    onClose();
+    if (!formData.imageFile) {
+      toast({
+        title: "Missing Image",
+        description: "Please upload an image of your artwork.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      // Simulate API call for artwork upload
+      const artworkData = {
+        title: formData.title,
+        description: formData.description,
+        artStyle: formData.artStyle,
+        medium: formData.medium,
+        dimensions: formData.dimensions,
+        price: parseFloat(formData.price),
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        status: formData.status,
+        imageFile: formData.imageFile,
+        uploadDate: new Date().toISOString(),
+        artistId: 'current-user-id' // This would come from auth context
+      };
+
+      // Show loading state
+      toast({
+        title: "Uploading Artwork",
+        description: "Please wait while we process your artwork..."
+      });
+
+      // Simulate upload progress
+      for (let i = 0; i <= 100; i += 10) {
+        setUploadProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+
+      // Success message
+      toast({
+        title: "Artwork Uploaded Successfully!",
+        description: `${formData.title} has been ${formData.status === 'published' ? 'published and is now live' : 'saved as draft'}!`
+      });
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        artStyle: "",
+        medium: "",
+        dimensions: "",
+        price: "",
+        tags: "",
+        status: "draft",
+        imageFile: null
+      });
+      setImagePreview(null);
+      
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "There was an error uploading your artwork. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   return (
@@ -78,28 +209,70 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
                 <Image className="w-4 h-4" />
                 Artwork Image *
               </Label>
-              <Card className="border-2 border-dashed border-gray-300 hover:border-orange-400 transition-colors">
+              <Card className={`border-2 border-dashed transition-colors ${
+                isDragOver 
+                  ? 'border-orange-400 bg-orange-50' 
+                  : 'border-gray-300 hover:border-orange-400'
+              }`}>
                 <CardContent className="p-6">
                   {imagePreview ? (
                     <div className="space-y-4">
-                      <img 
-                        src={imagePreview} 
-                        alt="Preview" 
-                        className="w-full h-64 object-cover rounded-lg"
-                      />
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setImagePreview(null)}
-                        className="w-full"
-                      >
-                        Change Image
-                      </Button>
+                      <div className="relative">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="w-full h-64 object-cover rounded-lg"
+                        />
+                        <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setImagePreview(null);
+                              handleInputChange('imageFile', null);
+                            }}
+                            className="text-white hover:text-red-400 h-6 w-6 p-0"
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 mb-2">
+                          {formData.imageFile?.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formData.imageFile && `Size: ${(formData.imageFile.size / 1024 / 1024).toFixed(2)} MB`}
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setImagePreview(null);
+                            handleInputChange('imageFile', null);
+                          }}
+                          className="mt-2"
+                          size="sm"
+                        >
+                          Change Image
+                        </Button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="text-center">
-                      <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600 mb-4">
-                        Click to upload or drag and drop your artwork
+                    <div 
+                      className={`text-center transition-colors ${
+                        isDragOver ? 'bg-orange-50' : ''
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
+                      <Upload className={`w-12 h-12 mx-auto mb-4 ${
+                        isDragOver ? 'text-orange-500' : 'text-gray-400'
+                      }`} />
+                      <p className={`mb-4 ${
+                        isDragOver ? 'text-orange-700' : 'text-gray-600'
+                      }`}>
+                        {isDragOver ? 'Drop your artwork here' : 'Click to upload or drag and drop your artwork'}
                       </p>
                       <p className="text-sm text-gray-500 mb-4">
                         PNG, JPG, GIF up to 10MB
@@ -107,13 +280,15 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
                       <input
                         id="artwork-image"
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/jpg,image/png,image/gif"
                         onChange={handleImageUpload}
                         className="hidden"
                       />
                       <Button 
                         variant="outline"
                         onClick={() => document.getElementById('artwork-image')?.click()}
+                        type="button"
+                        disabled={isUploading}
                       >
                         Choose File
                       </Button>
@@ -239,16 +414,57 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
           </div>
         </div>
 
+        {/* Upload Progress */}
+        {isUploading && (
+          <Card className="bg-blue-50 border-blue-200">
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">
+                    Uploading artwork... {uploadProgress}%
+                  </span>
+                </div>
+                <Progress value={uploadProgress} className="h-2" />
+                <p className="text-xs text-blue-600">
+                  Please don't close this window while uploading.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Action Buttons */}
         <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            disabled={isUploading}
+          >
+            {isUploading ? 'Uploading...' : 'Cancel'}
           </Button>
           <Button 
             className="bg-gradient-cultural hover:shadow-warm"
             onClick={handleSubmit}
+            disabled={isUploading}
           >
-            {formData.status === 'published' ? 'Publish Artwork' : 'Save Draft'}
+            {isUploading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                {formData.status === 'published' ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Publish Artwork
+                  </>
+                ) : (
+                  'Save Draft'
+                )}
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>
