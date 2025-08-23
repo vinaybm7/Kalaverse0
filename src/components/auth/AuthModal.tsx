@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { LoginForm } from './LoginForm'
 import { SignupForm } from './SignupForm'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ interface AuthModalProps {
 
 export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) => {
   const [mode, setMode] = useState<'login' | 'signup'>(defaultMode)
+  const { user } = useAuth()
 
   // Reset mode when modal opens with new defaultMode
   useEffect(() => {
@@ -18,6 +20,13 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
       setMode(defaultMode)
     }
   }, [isOpen, defaultMode])
+
+  // Close modal when user becomes authenticated
+  useEffect(() => {
+    if (user && isOpen) {
+      onClose()
+    }
+  }, [user, isOpen, onClose])
 
   const toggleMode = () => {
     setMode(mode === 'login' ? 'signup' : 'login')
@@ -36,7 +45,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           
           <div className="relative z-10 backdrop-blur-sm">
             {mode === 'login' ? (
-              <LoginForm onToggleMode={toggleMode} />
+              <LoginForm onToggleMode={toggleMode} onClose={onClose} />
             ) : (
               <SignupForm onToggleMode={toggleMode} />
             )}

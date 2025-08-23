@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,15 +10,26 @@ import { Eye, EyeOff, Loader2, Palette } from 'lucide-react'
 
 interface LoginFormProps {
   onToggleMode: () => void
+  onClose?: () => void
 }
 
-export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
+export const LoginForm = ({ onToggleMode, onClose }: LoginFormProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { signIn } = useAuth()
+  const { signIn, user } = useAuth()
   const navigate = useNavigate()
+
+  // Navigate to dashboard when user becomes authenticated
+  useEffect(() => {
+    if (user && !loading) {
+      if (onClose) {
+        onClose()
+      }
+      navigate('/dashboard')
+    }
+  }, [user, loading, navigate, onClose])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,12 +47,14 @@ export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
       } else {
         toast({
           title: "Welcome back to KalaVerse! 🎨",
-          description: "Your journey into traditional Indian art continues."
+          description: "Redirecting to your dashboard..."
         })
-        // Redirect to dashboard after successful login
-        setTimeout(() => {
-          navigate('/dashboard')
-        }, 1000)
+        // Close modal immediately and redirect
+        if (onClose) {
+          onClose()
+        }
+        // Navigate immediately after successful login
+        navigate('/dashboard')
       }
     } catch (error) {
       toast({
