@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart, Eye, MapPin } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 
 const artworks = [
   {
@@ -84,6 +85,7 @@ const artworks = [
 export const ArtGallery = () => {
   const [likedArtworks, setLikedArtworks] = useState<number[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const { addToCart } = useCart();
 
   const categories = ["All", "Warli Art", "Madhubani Art", "Pithora Art"];
 
@@ -110,9 +112,13 @@ export const ArtGallery = () => {
   };
 
   const handleAddToCart = (artwork: typeof artworks[0]) => {
-    toast({
-      title: "Added to Cart",
-      description: `${artwork.title} by ${artwork.artist} has been added to your cart.`
+    addToCart({
+      id: artwork.id,
+      title: artwork.title,
+      artist: artwork.artist,
+      category: artwork.category,
+      price: artwork.price,
+      image: artwork.image
     });
   };
 

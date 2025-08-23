@@ -12,7 +12,7 @@ const artists = [
     rating: 4.9,
     artworks: 32,
     description: "Master of traditional Warli art with 25+ years of experience",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    avatar: "/artist-1.png"
   },
   {
     id: "sunita-devi",
@@ -22,7 +22,7 @@ const artists = [
     rating: 4.8,
     artworks: 28,
     description: "Award-winning Madhubani artist preserving ancient techniques",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+    avatar: "/artist-2.png"
   },
   {
     id: "kishore-rathwa",
@@ -32,7 +32,7 @@ const artists = [
     rating: 4.9,
     artworks: 45,
     description: "Traditional Pithora artist creating vibrant cultural narratives",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+    avatar: "/artist-3.png"
   }
 ];
 

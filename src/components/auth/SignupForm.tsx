@@ -99,7 +99,11 @@ export const SignupForm = ({ onToggleMode }: SignupFormProps) => {
         </div>
         
         <div className="mt-6 mb-2">
-          <Sparkles className="w-6 h-6 mx-auto mb-2 text-primary" />
+          <img 
+            src="/logo.png" 
+            alt="KalaVerse Logo" 
+            className="h-10 w-auto mx-auto mb-2"
+          />
         </div>
         
         <CardTitle className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent mb-1">

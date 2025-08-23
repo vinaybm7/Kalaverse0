@@ -7,9 +7,16 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <h3 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent mb-4">
-              KalaVerse
-            </h3>
+            <div className="flex items-center gap-2 mb-4">
+              <img 
+                src="/logo.png" 
+                alt="KalaVerse Logo" 
+                className="h-8 w-auto"
+              />
+              <h3 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent">
+                KalaVerse
+              </h3>
+            </div>
             <p className="text-muted-foreground mb-4">
               Preserving India's rich cultural heritage through digital innovation. 
               Supporting traditional artists and connecting them with the world.

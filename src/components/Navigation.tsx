@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Search, Menu, ShoppingBag, User, LogOut, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { CartModal } from "@/components/cart/CartModal";
 import { toast } from "@/hooks/use-toast";
 
 export const Navigation = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const { user, signOut, loading } = useAuth();
+  const { getTotalItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,7 +66,12 @@ export const Navigation = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center">
-              <Link to="/">
+              <Link to="/" className="flex items-center gap-2">
+                <img 
+                  src="/logo.png" 
+                  alt="KalaVerse Logo" 
+                  className="h-8 w-auto hover:opacity-80 transition-opacity"
+                />
                 <h2 className="text-2xl font-bold bg-gradient-cultural bg-clip-text text-transparent hover:opacity-80 transition-opacity">
                   KalaVerse
                 </h2>
@@ -113,14 +123,18 @@ export const Navigation = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => {
-                  toast({
-                    title: "Shopping Cart",
-                    description: "Cart functionality coming soon!"
-                  });
-                }}
+                onClick={() => setIsCartModalOpen(true)}
+                className="relative"
               >
                 <ShoppingBag className="w-4 h-4" />
+                {getTotalItems() > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {getTotalItems()}
+                  </Badge>
+                )}
               </Button>
               
               {/* Auth Section */}
@@ -193,6 +207,12 @@ export const Navigation = () => {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)}
         defaultMode={authMode}
+      />
+
+      {/* Cart Modal */}
+      <CartModal 
+        isOpen={isCartModalOpen} 
+        onClose={() => setIsCartModalOpen(false)}
       />
     </>
   );

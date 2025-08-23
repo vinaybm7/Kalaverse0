@@ -77,7 +77,11 @@ export const LoginForm = ({ onToggleMode, onClose }: LoginFormProps) => {
         </div>
         
         <div className="mt-8 mb-4">
-          <Palette className="w-8 h-8 mx-auto mb-3 text-primary" />
+          <img 
+            src="/logo.png" 
+            alt="KalaVerse Logo" 
+            className="h-12 w-auto mx-auto mb-3"
+          />
         </div>
         
         <CardTitle className="text-3xl font-bold bg-gradient-cultural bg-clip-text text-transparent mb-2">
