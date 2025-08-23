@@ -8,14 +8,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { ArtworkService } from "@/services/artworkService";
 import { Upload, Image, Palette, Tag, DollarSign, CheckCircle, Loader2 } from "lucide-react";
 
 interface UploadArtworkModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onArtworkUploaded?: (artwork: any) => void;
 }
 
-export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps) => {
+export const UploadArtworkModal = ({ isOpen, onClose, onArtworkUploaded }: UploadArtworkModalProps) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -127,24 +131,18 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
       return;
     }
 
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to upload artwork.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsUploading(true);
-      setUploadProgress(0);
-
-      // Simulate API call for artwork upload
-      const artworkData = {
-        title: formData.title,
-        description: formData.description,
-        artStyle: formData.artStyle,
-        medium: formData.medium,
-        dimensions: formData.dimensions,
-        price: parseFloat(formData.price),
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        status: formData.status,
-        imageFile: formData.imageFile,
-        uploadDate: new Date().toISOString(),
-        artistId: 'current-user-id' // This would come from auth context
-      };
+      setUploadProgress(20);
 
       // Show loading state
       toast({
@@ -152,17 +150,46 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
         description: "Please wait while we process your artwork..."
       });
 
-      // Simulate upload progress
-      for (let i = 0; i <= 100; i += 10) {
-        setUploadProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 200));
+      setUploadProgress(40);
+
+      // Prepare artwork data for Supabase
+      const artworkData = {
+        title: formData.title,
+        description: formData.description,
+        art_style: formData.artStyle || null,
+        medium: formData.medium || null,
+        dimensions: formData.dimensions || null,
+        price: parseFloat(formData.price),
+        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : null,
+        status: formData.status as 'draft' | 'published',
+        artist_id: user.id,
+        likes: 0,
+        views: 0
+      };
+
+      setUploadProgress(60);
+
+      // Create artwork in Supabase
+      const createdArtwork = await ArtworkService.createArtwork(artworkData, formData.imageFile);
+
+      setUploadProgress(90);
+
+      if (!createdArtwork) {
+        throw new Error('Failed to create artwork');
       }
+
+      setUploadProgress(100);
 
       // Success message
       toast({
         title: "Artwork Uploaded Successfully!",
         description: `${formData.title} has been ${formData.status === 'published' ? 'published and is now live' : 'saved as draft'}!`
       });
+
+      // Notify parent component
+      if (onArtworkUploaded) {
+        onArtworkUploaded(createdArtwork);
+      }
 
       // Reset form
       setFormData({
@@ -180,6 +207,7 @@ export const UploadArtworkModal = ({ isOpen, onClose }: UploadArtworkModalProps)
       
       onClose();
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: "Upload Failed",
         description: "There was an error uploading your artwork. Please try again.",

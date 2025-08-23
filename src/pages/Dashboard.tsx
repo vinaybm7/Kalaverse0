@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { ArtworkService } from "@/services/artworkService";
+import { Database } from "@/lib/database.types";
 import { WishlistModal } from "@/components/dashboard/WishlistModal";
 import { ProfileEditModal } from "@/components/dashboard/ProfileEditModal";
 import { UploadArtworkModal } from "@/components/dashboard/UploadArtworkModal";
@@ -29,9 +31,13 @@ import {
   Globe
 } from "lucide-react";
 
+type Artwork = Database['public']['Tables']['artworks']['Row'];
+
 const Dashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Modal states
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
@@ -46,7 +52,73 @@ const Dashboard = () => {
   // Get user type from metadata
   const userType = user?.user_metadata?.user_type || "buyer";
   const isArtist = userType === "artist";
+
+  // Load artworks when component mounts or user changes
+  useEffect(() => {
+    if (user && isArtist) {
+      loadArtworks();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user, isArtist]);
+
+  const loadArtworks = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoading(true);
+      const userArtworks = await ArtworkService.getArtworksByArtist(user.id);
+      setArtworks(userArtworks);
+    } catch (error) {
+      console.error('Error loading artworks:', error);
+      toast({
+        title: "Error Loading Artworks",
+        description: "Failed to load your artworks. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle new artwork upload
+  const handleArtworkUploaded = (newArtwork: Artwork) => {
+    setArtworks(prev => [newArtwork, ...prev]);
+    toast({
+      title: "Artwork Added to Gallery",
+      description: `${newArtwork.title} has been added to your artwork collection!`
+    });
+  };
+
+  // Handle artwork deletion
+  const handleDeleteArtwork = async (artworkId: string, artworkTitle: string) => {
+    try {
+      const success = await ArtworkService.deleteArtwork(artworkId);
+      if (success) {
+        setArtworks(prev => prev.filter(artwork => artwork.id !== artworkId));
+        toast({
+          title: "Artwork Deleted",
+          description: `${artworkTitle} has been removed from your collection.`,
+          variant: "destructive"
+        });
+      } else {
+        throw new Error('Failed to delete artwork');
+      }
+    } catch (error) {
+      console.error('Error deleting artwork:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete the artwork. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
   
+  // Calculate stats from real data
+  const totalLikes = artworks.reduce((sum, artwork) => sum + artwork.likes, 0);
+  const totalViews = artworks.reduce((sum, artwork) => sum + artwork.views, 0);
+  const publishedArtworks = artworks.filter(artwork => artwork.status === 'published');
+
   // Mock user data - in real app, fetch from API
   const userData = {
     profile: {
@@ -60,45 +132,17 @@ const Dashboard = () => {
       location: isArtist ? "Jaipur, Rajasthan" : "Mumbai, India"
     },
     stats: isArtist ? {
-      artworks: 12,
-      likes: 234,
-      views: 1567,
-      followers: 89
+      artworks: artworks.length,
+      likes: totalLikes,
+      views: totalViews,
+      followers: 89 // This would come from a followers table
     } : {
       favorites: 8,
       purchases: 5,
       reviews: 12,
       following: 23
     },
-    myArtworks: isArtist ? [
-      {
-        id: 1,
-        title: "Sunset Mandala",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop",
-        status: "Published",
-        likes: 45,
-        views: 234,
-        price: "₹8,000"
-      },
-      {
-        id: 2,
-        title: "Traditional Dance",
-        image: "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=300&h=300&fit=crop",
-        status: "Draft",
-        likes: 0,
-        views: 0,
-        price: "₹12,000"
-      },
-      {
-        id: 3,
-        title: "Peacock Feathers",
-        image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=300&fit=crop",
-        status: "Published",
-        likes: 67,
-        views: 456,
-        price: "₹15,000"
-      }
-    ] : [],
+    myArtworks: artworks,
     favorites: [
       {
         id: 1,
@@ -547,75 +591,110 @@ const Dashboard = () => {
             </div>
 
             {isArtist ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userData.myArtworks.map((artwork) => (
-                <Card key={artwork.id} className="overflow-hidden hover:shadow-warm transition-all duration-300 group">
-                  <div className="relative">
-                    <img 
-                      src={artwork.image} 
-                      alt={artwork.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <Badge 
-                      className={`absolute top-3 right-3 ${
-                        artwork.status === 'Published' 
-                          ? 'bg-green-100 text-green-800 border-green-200' 
-                          : 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                      }`}
-                    >
-                      {artwork.status}
-                    </Badge>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-                  <CardContent className="p-4 bg-gradient-to-br from-white to-orange-50/30">
-                    <h3 className="font-semibold text-gray-900 mb-2">{artwork.title}</h3>
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
-                          <Heart className="w-3 h-3 text-red-500" />
-                          {artwork.likes}
-                        </span>
-                        <span className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
-                          <Eye className="w-3 h-3 text-blue-500" />
-                          {artwork.views}
-                        </span>
+              isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i} className="overflow-hidden animate-pulse">
+                      <div className="w-full h-48 bg-gray-200"></div>
+                      <CardContent className="p-4">
+                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded mb-3 w-2/3"></div>
+                        <div className="flex gap-2">
+                          <div className="h-8 bg-gray-200 rounded flex-1"></div>
+                          <div className="h-8 bg-gray-200 rounded w-12"></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : artworks.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {artworks.map((artwork) => (
+                    <Card key={artwork.id} className="overflow-hidden hover:shadow-warm transition-all duration-300 group">
+                      <div className="relative">
+                        <img 
+                          src={artwork.image_url || "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop"} 
+                          alt={artwork.title}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <Badge 
+                          className={`absolute top-3 right-3 ${
+                            artwork.status === 'published' 
+                              ? 'bg-green-100 text-green-800 border-green-200' 
+                              : 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                          }`}
+                        >
+                          {artwork.status === 'published' ? 'Published' : 'Draft'}
+                        </Badge>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                      <span className="font-semibold text-orange-600 bg-white/50 px-2 py-1 rounded-full">{artwork.price}</span>
+                      <CardContent className="p-4 bg-gradient-to-br from-white to-orange-50/30">
+                        <h3 className="font-semibold text-gray-900 mb-2">{artwork.title}</h3>
+                        <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
+                              <Heart className="w-3 h-3 text-red-500" />
+                              {artwork.likes}
+                            </span>
+                            <span className="flex items-center gap-1 bg-white/50 px-2 py-1 rounded-full">
+                              <Eye className="w-3 h-3 text-blue-500" />
+                              {artwork.views}
+                            </span>
+                          </div>
+                          <span className="font-semibold text-orange-600 bg-white/50 px-2 py-1 rounded-full">₹{artwork.price}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="flex-1 border-orange-200 hover:bg-orange-50"
+                            onClick={() => {
+                              toast({
+                                title: "Edit Artwork",
+                                description: `Editing ${artwork.title}...`
+                              })
+                            }}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Edit
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                            onClick={() => {
+                              if (window.confirm(`Are you sure you want to delete "${artwork.title}"? This action cannot be undone.`)) {
+                                handleDeleteArtwork(artwork.id, artwork.title);
+                              }
+                            }}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-24 h-24 bg-gradient-cultural rounded-full flex items-center justify-center mx-auto mb-4 opacity-20">
+                      <Upload className="w-12 h-12 text-white" />
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="flex-1 border-orange-200 hover:bg-orange-50"
-                        onClick={() => {
-                          toast({
-                            title: "Edit Artwork",
-                            description: `Editing ${artwork.title}...`
-                          })
-                        }}
-                      >
-                        <Edit className="w-3 h-3 mr-1" />
-                        Edit
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
-                        onClick={() => {
-                          toast({
-                            title: "Delete Artwork",
-                            description: `Are you sure you want to delete ${artwork.title}?`,
-                            variant: "destructive"
-                          })
-                        }}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Artworks Yet</h3>
+                    <p className="text-gray-600 mb-6">
+                      Start building your portfolio by uploading your first traditional artwork.
+                    </p>
+                    <Button 
+                      className="bg-gradient-cultural hover:shadow-warm transition-all duration-300"
+                      onClick={() => setIsUploadArtworkOpen(true)}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Upload Your First Artwork
+                    </Button>
+                  </div>
+                </div>
+              )
             ) : (
               <div className="text-center py-12">
                 <div className="max-w-md mx-auto">
@@ -846,7 +925,8 @@ const Dashboard = () => {
       />
       <UploadArtworkModal 
         isOpen={isUploadArtworkOpen} 
-        onClose={() => setIsUploadArtworkOpen(false)} 
+        onClose={() => setIsUploadArtworkOpen(false)}
+        onArtworkUploaded={handleArtworkUploaded}
       />
       <SalesManagementModal 
         isOpen={isSalesManagementOpen} 
