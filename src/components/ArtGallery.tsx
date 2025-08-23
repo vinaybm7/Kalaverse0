@@ -37,7 +37,7 @@ const artworks = [
   {
     id: 3,
     title: "Madhubani Mahavidyas",
-    artist: "Sunita Devi",
+    artist: "Kishore Rathwa",
     category: "Madhubani Art", 
     price: 3200,
     location: "Bihar",
@@ -61,7 +61,7 @@ const artworks = [
   {
     id: 5,
     title: "Sacred Horses",
-    artist: "Kishore Rathwa", 
+    artist: "Sunita Devi", 
     category: "Pithora Art",
     price: 2800,
     location: "Gujarat",

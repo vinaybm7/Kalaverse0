@@ -17,22 +17,22 @@ const artists = [
   {
     id: "sunita-devi",
     name: "Sunita Devi",
-    location: "Bihar", 
-    specialty: "Madhubani Art",
-    rating: 4.8,
-    artworks: 28,
-    description: "Award-winning Madhubani artist preserving ancient techniques",
-    avatar: "/artist-2.png"
-  },
-  {
-    id: "kishore-rathwa",
-    name: "Kishore Rathwa",
-    location: "Gujarat",
-    specialty: "Pithora Art", 
+    location: "Gujarat", 
+    specialty: "Pithora Art",
     rating: 4.9,
     artworks: 45,
     description: "Traditional Pithora artist creating vibrant cultural narratives",
     avatar: "/artist-3.png"
+  },
+  {
+    id: "kishore-rathwa",
+    name: "Kishore Rathwa",
+    location: "Bihar",
+    specialty: "Madhubani Art", 
+    rating: 4.8,
+    artworks: 28,
+    description: "Award-winning Madhubani artist preserving ancient techniques",
+    avatar: "/artist-2.png"
   }
 ];
 
