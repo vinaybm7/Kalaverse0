@@ -20,6 +20,7 @@ export const SignupForm = ({ onToggleMode }: SignupFormProps) => {
     userType: 'buyer' // buyer or artist
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { signUp } = useAuth()
 
@@ -212,16 +213,31 @@ export const SignupForm = ({ onToggleMode }: SignupFormProps) => {
             <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
               Confirm Password
             </Label>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              className="h-10 border-2 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 bg-background/50 backdrop-blur-sm transition-all duration-200"
-              required
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className="h-10 border-2 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 bg-background/50 backdrop-blur-sm transition-all duration-200 pr-10"
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-2 py-2 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-3 w-3" />
+                ) : (
+                  <Eye className="h-3 w-3" />
+                )}
+              </Button>
+            </div>
           </div>
 
           <Button 

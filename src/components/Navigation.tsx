@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, ShoppingBag, User, LogOut, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +10,8 @@ export const Navigation = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     try {
@@ -32,6 +34,26 @@ export const Navigation = () => {
     setIsAuthModalOpen(true);
   };
 
+  const handleNavigation = (section: string) => {
+    // If we're on the dashboard, navigate to home first then scroll to section
+    if (location.pathname === '/dashboard') {
+      navigate('/');
+      // Small delay to ensure navigation completes before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(section);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      // If we're already on home page, just scroll to section
+      const element = document.getElementById(section);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
@@ -48,18 +70,30 @@ export const Navigation = () => {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#categories" className="text-foreground hover:text-primary transition-colors">
+              <button 
+                onClick={() => handleNavigation('categories')} 
+                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Categories
-              </a>
-              <a href="#gallery" className="text-foreground hover:text-primary transition-colors">
+              </button>
+              <button 
+                onClick={() => handleNavigation('gallery')} 
+                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Gallery
-              </a>
-              <a href="#artists" className="text-foreground hover:text-primary transition-colors">
+              </button>
+              <button 
+                onClick={() => handleNavigation('artists')} 
+                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Artists
-              </a>
-              <a href="#about" className="text-foreground hover:text-primary transition-colors">
+              </button>
+              <button 
+                onClick={() => handleNavigation('about')} 
+                className="text-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 About
-              </a>
+              </button>
             </div>
             
             {/* Search and Actions */}
