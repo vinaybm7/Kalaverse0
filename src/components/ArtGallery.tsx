@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -115,12 +116,7 @@ export const ArtGallery = () => {
     });
   };
 
-  const handleViewArtwork = (artwork: typeof artworks[0]) => {
-    toast({
-      title: "Artwork Details",
-      description: `Opening detailed view for ${artwork.title} by ${artwork.artist}.`
-    });
-  };
+
 
   return (
     <section id="gallery" className="py-20">
@@ -153,32 +149,37 @@ export const ArtGallery = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredArtworks.map((artwork) => (
             <Card key={artwork.id} className="group hover:shadow-warm transition-all duration-300 overflow-hidden">
-              <div className="relative">
-                <img 
-                  src={artwork.image}
-                  alt={artwork.title}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+              <Link to={`/artwork/${artwork.id}`}>
+                <div className="relative cursor-pointer">
+                  <img 
+                    src={artwork.image}
+                    alt={artwork.title}
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 <div className="absolute top-3 left-3">
                   <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
                     {artwork.category}
                   </Badge>
                 </div>
-                <Button
-                  variant="ghost" 
-                  size="icon"
-                  className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm hover:bg-background/90"
-                  onClick={() => handleLike(artwork.id)}
-                >
-                  <Heart 
-                    className={`w-4 h-4 transition-colors ${
-                      likedArtworks.includes(artwork.id) 
-                        ? 'fill-red-500 text-red-500' 
-                        : 'text-muted-foreground'
-                    }`} 
-                  />
-                </Button>
-              </div>
+                  <Button
+                    variant="ghost" 
+                    size="icon"
+                    className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm hover:bg-background/90 z-10"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLike(artwork.id);
+                    }}
+                  >
+                    <Heart 
+                      className={`w-4 h-4 transition-colors ${
+                        likedArtworks.includes(artwork.id) 
+                          ? 'fill-red-500 text-red-500' 
+                          : 'text-muted-foreground'
+                      }`} 
+                    />
+                  </Button>
+                </div>
+              </Link>
 
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -220,13 +221,14 @@ export const ArtGallery = () => {
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Add to Cart
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      onClick={() => handleViewArtwork(artwork)}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
+                    <Link to={`/artwork/${artwork.id}`}>
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>

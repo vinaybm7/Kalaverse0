@@ -1,10 +1,11 @@
+import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Star } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 
 const artists = [
   {
+    id: "rajesh-baiga",
     name: "Rajesh Baiga",
     location: "Maharashtra",
     specialty: "Warli Art",
@@ -14,6 +15,7 @@ const artists = [
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
   },
   {
+    id: "sunita-devi",
     name: "Sunita Devi",
     location: "Bihar", 
     specialty: "Madhubani Art",
@@ -23,6 +25,7 @@ const artists = [
     avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
   },
   {
+    id: "kishore-rathwa",
     name: "Kishore Rathwa",
     location: "Gujarat",
     specialty: "Pithora Art", 
@@ -82,15 +85,11 @@ export const FeaturedArtists = () => {
                   </div>
                 </div>
                 
-                <Button variant="secondary" className="w-full" 
-                        onClick={() => {
-                          toast({
-                            title: "Artist Profile",
-                            description: `Viewing ${artist.name}'s complete portfolio and contact information.`
-                          })
-                        }}>
-                  View Profile
-                </Button>
+                <Link to={`/artist/${artist.id}`}>
+                  <Button variant="secondary" className="w-full">
+                    View Profile
+                  </Button>
+                </Link>
               </div>
             </Card>
           ))}
