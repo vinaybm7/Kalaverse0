@@ -87,9 +87,13 @@ The migrations should create the storage buckets automatically, but if they don'
 ### 6. Configure Authentication
 
 1. Go to **Authentication** → **Settings**
-2. Configure your authentication providers
-3. Set up email templates if needed
-4. Configure redirect URLs for your domain
+2. **Disable Email Verification** (Important):
+   - Scroll down to **Email Auth**
+   - Turn OFF "Enable email confirmations"
+   - This allows users to sign in immediately without email verification
+3. Configure your authentication providers
+4. Set up email templates if needed
+5. Configure redirect URLs for your domain
 
 ### 7. Test the Setup
 
