@@ -71,7 +71,7 @@ export const SignupForm = ({ onToggleMode }: SignupFormProps) => {
       } else {
         toast({
           title: "Welcome to KalaVerse! 🎨",
-          description: "Account created successfully! Please sign in to continue your artistic journey."
+          description: "Account created successfully! You can sign in immediately - no email verification required."
         })
         // Redirect to login after successful signup
         setTimeout(() => {

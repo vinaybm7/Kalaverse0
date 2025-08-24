@@ -54,13 +54,25 @@ If you want to keep some email validation:
 
 ### Troubleshooting
 
-**Issue**: Users still getting verification emails
-- **Solution**: Clear browser cache and try again
+**Issue**: Users still getting "email not verified" errors
+- **Solution 1**: Clear browser cache and try again
+- **Solution 2**: For existing users, manually confirm them in Supabase dashboard:
+  1. Go to Authentication → Users
+  2. Find the user and click on them
+  3. Toggle "Email Confirmed" to ON
 - **Check**: Ensure the setting is saved in Supabase dashboard
 
 **Issue**: Authentication errors after disabling
 - **Solution**: Restart your development server
 - **Check**: Verify Supabase environment variables are correct
+
+**Issue**: Existing users can't login after disabling verification
+- **Root Cause**: Users who signed up before disabling still have unverified status
+- **Solution**: Manually verify existing users in Supabase dashboard:
+  1. Go to Authentication → Users in Supabase dashboard
+  2. Click on each user who can't login
+  3. Toggle "Email Confirmed" to ON and save
+  4. User should now be able to login immediately
 
 ## Current Configuration
 
@@ -92,13 +104,32 @@ After completing these steps:
 - ✅ Immediate authentication flow
 - ✅ Better user experience for Kalaverse
 
+## Bulk User Verification (For Existing Users)
+
+If you have existing users who can't login, you can verify them all at once using SQL:
+
+1. Go to Supabase Dashboard → SQL Editor
+2. Run this query to verify all existing users:
+
+```sql
+-- Verify all existing users
+UPDATE auth.users 
+SET email_confirmed_at = NOW(), 
+    confirmed_at = NOW() 
+WHERE email_confirmed_at IS NULL;
+```
+
+3. This will allow all existing users to login immediately
+
 ## Need Help?
 
 If you encounter issues:
 
-1. Check the Supabase dashboard settings again
-2. Clear browser cache and cookies
-3. Restart your development server
-4. Check browser console for any auth errors
+1. **Check Supabase Settings**: Ensure "Enable email confirmations" is OFF
+2. **Verify Existing Users**: Use the SQL query above for bulk verification
+3. **Manual Verification**: Verify individual users in Authentication → Users
+4. **Clear Cache**: Clear browser cache and cookies
+5. **Restart Server**: Restart your development server
+6. **Check Console**: Look for auth errors in browser console
 
 The authentication should now work without email verification!

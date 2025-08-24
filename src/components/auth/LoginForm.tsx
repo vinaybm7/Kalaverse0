@@ -39,11 +39,20 @@ export const LoginForm = ({ onToggleMode, onClose }: LoginFormProps) => {
       const { error } = await signIn(email, password)
       
       if (error) {
-        toast({
-          title: "Login Failed",
-          description: error.message,
-          variant: "destructive"
-        })
+        // Handle email verification errors specifically
+        if (error.message.includes('email not confirmed') || error.message.includes('Email not confirmed')) {
+          toast({
+            title: "Account Access",
+            description: "Your account is ready to use! Email verification has been disabled. Please try signing in again.",
+            variant: "default"
+          })
+        } else {
+          toast({
+            title: "Login Failed",
+            description: error.message,
+            variant: "destructive"
+          })
+        }
       } else {
         toast({
           title: "Welcome back to KalaVerse! 🎨",
